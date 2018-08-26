@@ -13,7 +13,6 @@ namespace SimpleMediator
             var registrations = new List<Tuple<Type, Type>>();
 
             registrations.AddRange(GetRequestHandlersWithResponse(assembly));
-            registrations.AddRange(GetRequestHandlersWithNoResponse(assembly));
 
             return registrations;
         }
@@ -24,7 +23,7 @@ namespace SimpleMediator
 
             return queryHandlers.Where(t => !t.IsAbstract).Select(t =>
             {
-                var method = t.GetMethod(nameof(IRequestHandler<IRequest<object>, object>.HandleAsync));
+                var method = t.GetMethod(nameof(IRequestHandler<IQuery<object>, object>.HandleAsync));
 
                 if (method == null || method.ReturnType.GetGenericArguments().Length != 1 || method.GetParameters().Length != 1)
                 {
@@ -35,26 +34,6 @@ namespace SimpleMediator
                 var responseType = method.ReturnType.GetGenericArguments()[0];
 
                 var genericHandlerType = typeof(IRequestHandler<,>).MakeGenericType(requestType, responseType);
-                return new Tuple<Type, Type>(genericHandlerType, t);
-            }).ToList();
-        }
-
-        private static IList<Tuple<Type, Type>> GetRequestHandlersWithNoResponse(this Assembly assembly)
-        {
-            var queryHandlers = GetAllTypesImplementingOpenGenericType(typeof(IRequestHandler<>), assembly);
-
-            return queryHandlers.Where(t => !t.IsAbstract).Select(t =>
-            {
-                var method = t.GetMethod(nameof(IRequestHandler<IRequest>.HandleAsync));
-
-                if (method == null)
-                {
-                    throw new ArgumentException($"{t.Name} is not a known {typeof(IRequestHandler<>).Name}", t.AssemblyQualifiedName);
-                }
-
-                var requestType = method.GetParameters().First().ParameterType;
-
-                var genericHandlerType = typeof(IRequestHandler<>).MakeGenericType(requestType);
                 return new Tuple<Type, Type>(genericHandlerType, t);
             }).ToList();
         }

@@ -14,30 +14,23 @@ namespace SimpleMediator
             _factoryFunc = factoryFunc;
         }
 
-        public async Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request)
+        public async Task<TResponse> SendAsync<TResponse>(IQuery<TResponse> request)
         {
             var targetType = request.GetType();
             var targetHandler = typeof(IRequestHandler<,>).MakeGenericType(targetType, typeof(TResponse));
 
             var instance = _factoryFunc.Invoke(targetHandler);
 
-            return await (Task<TResponse>)instance.GetType()
+            var method = instance.GetType()
                 .GetTypeInfo()
-                .GetDeclaredMethod(nameof(IRequestHandler<IRequest<TResponse>, TResponse>.HandleAsync))
-                .Invoke(instance, new object[] { request });
-        }
+                .GetMethod(nameof(IRequestHandler<IQuery<TResponse>, TResponse>.HandleAsync));
 
-        public async Task SendAsync<TRequest>(TRequest request) where TRequest : IRequest
-        {
-            var targetType = typeof(TRequest);
-            var targetHandler = typeof(IRequestHandler<>).MakeGenericType(targetType);
+            if (method == null)
+            {
+                throw new ArgumentException($"{instance.GetType().Name} is not a known {targetHandler.Name}", instance.GetType().FullName);
+            }
 
-            var instance = (IRequestHandler<TRequest>)_factoryFunc.Invoke(targetHandler);
-
-            await (Task)instance.GetType()
-                .GetTypeInfo()
-                .GetDeclaredMethod(nameof(IRequestHandler<IRequest>.HandleAsync))
-                .Invoke(instance, new object[] { request });
+            return await (Task<TResponse>)method.Invoke(instance, new object[] { request });
         }
     }
 }

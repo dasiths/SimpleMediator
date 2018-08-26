@@ -11,7 +11,6 @@ namespace SimpleMediator.Samples.ConsoleApp
         public static async Task Main(string[] args)
         {
             var services = new ServiceCollection();
-            //services.AddSingleton(typeof(IRequestHandler<IRequest<SimpleResponse>, SimpleResponse>), typeof(SimpleRequestHandler));
 
             foreach (var requestHandler in Assembly.GetEntryAssembly().GetRequestHandlers())
             {
@@ -20,13 +19,11 @@ namespace SimpleMediator.Samples.ConsoleApp
 
             using (var container = services.BuildServiceProvider())
             {
-                Func<Type, object> factory = (t) => container.GetService(t);
-
-                var mediator = new Mediator(factory);
-                var simpleRequest = new SimpleRequest();
+                var mediator = new Mediator(container.GetService);
+                var simpleQuery = new SimpleQuery();
                 var simpleCommand = new SimpleCommand();
 
-                var result = await mediator.SendAsync<SimpleResponse>(simpleRequest);
+                var result = await mediator.SendAsync(simpleQuery);
                 Console.WriteLine(result.Message);
                 await mediator.SendAsync(simpleCommand);
                 Console.ReadLine();
