@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using SimpleMediator.Core;
 
@@ -19,10 +17,23 @@ namespace SimpleMediator.Samples.ConsoleApp
     {
         public async Task<SimpleResponse> HandleAsync(SimpleRequest request)
         {
-            return new SimpleResponse()
+            return await Task.FromResult(new SimpleResponse()
             {
                 Message = "Hello World"
-            };
+            });
+        }
+    }
+
+    public class SimpleCommand : IRequest
+    {
+
+    }
+
+    public class SimpleCommandHandler : IRequestHandler<SimpleCommand>
+    {
+        public async Task HandleAsync(SimpleCommand request)
+        {
+            Console.WriteLine("Test Command");
         }
     }
 }

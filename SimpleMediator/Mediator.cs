@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using SimpleMediator.Core;
@@ -18,24 +16,28 @@ namespace SimpleMediator
 
         public async Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request)
         {
-            var targetType = typeof(IRequest<>).MakeGenericType(typeof(TResponse));
-            var instance = _factoryFunc.Invoke(targetType);
+            var targetType = request.GetType();
+            var targetHandler = typeof(IRequestHandler<,>).MakeGenericType(targetType, typeof(TResponse));
+
+            var instance = _factoryFunc.Invoke(targetHandler);
 
             return await (Task<TResponse>)instance.GetType()
                 .GetTypeInfo()
                 .GetDeclaredMethod(nameof(IRequestHandler<IRequest<TResponse>, TResponse>.HandleAsync))
-                .Invoke(instance, new[] { request });
+                .Invoke(instance, new object[] { request });
         }
 
-        public async Task ExecuteAsync<TRequest>(TRequest request) where TRequest : IRequest
+        public async Task SendAsync<TRequest>(TRequest request) where TRequest : IRequest
         {
             var targetType = typeof(TRequest);
-            var instance = (IRequestHandler<TRequest>)_factoryFunc.Invoke(targetType);
+            var targetHandler = typeof(IRequestHandler<>).MakeGenericType(targetType);
+
+            var instance = (IRequestHandler<TRequest>)_factoryFunc.Invoke(targetHandler);
 
             await (Task)instance.GetType()
                 .GetTypeInfo()
                 .GetDeclaredMethod(nameof(IRequestHandler<IRequest>.HandleAsync))
-                .Invoke(instance, null);
+                .Invoke(instance, new object[] { request });
         }
     }
 }
