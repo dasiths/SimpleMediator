@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SimpleMediator.Core;
+using SimpleMediator.Middleware;
 
-namespace SimpleMediator
+namespace SimpleMediator.Extensions
 {
     public static class TypeScanner
     {
@@ -12,16 +13,15 @@ namespace SimpleMediator
         {
             var registrations = new List<Tuple<Type, Type>>();
 
-            registrations.AddRange(GetRequestHandlersWithResponse(assembly));
-
+            registrations.AddRange(GetRequestHandlerTypes(assembly));
             return registrations;
         }
 
-        private static IList<Tuple<Type, Type>> GetRequestHandlersWithResponse(this Assembly assembly)
+        private static IList<Tuple<Type, Type>> GetRequestHandlerTypes(this Assembly assembly)
         {
             var queryHandlers = GetAllTypesImplementingOpenGenericType(typeof(IRequestHandler<,>), assembly);
 
-            return queryHandlers.Where(t => !t.IsAbstract).Select(t =>
+            return queryHandlers.Where(t => !t.IsAbstract && !t.IsGenericType).Select(t =>
             {
                 var method = t.GetMethod(nameof(IRequestHandler<IQuery<object>, object>.HandleAsync));
 

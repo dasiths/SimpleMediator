@@ -1,6 +1,6 @@
 ﻿namespace SimpleMediator.Core
 {
-    public interface IQuery<TResult>
+    public interface IQuery<TResult>: IRequest<TResult>
     {
     }
 }

@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using SimpleMediator.Core;
+using SimpleMediator.Extensions;
 
 namespace SimpleMediator.Samples.ConsoleApp
 {
@@ -19,7 +19,8 @@ namespace SimpleMediator.Samples.ConsoleApp
 
             using (var container = services.BuildServiceProvider())
             {
-                var mediator = new Mediator(container.GetService);
+                var func = new Func<Type, object>(container.GetService);
+                var mediator = new Mediator(func.ToServiceFactory());
                 var simpleQuery = new SimpleQuery();
                 var simpleCommand = new SimpleCommand();
 

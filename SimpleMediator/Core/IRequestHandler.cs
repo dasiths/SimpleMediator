@@ -2,7 +2,7 @@
 
 namespace SimpleMediator.Core
 {
-    public interface IRequestHandler<in TRequest, TResponse> where TRequest : IQuery<TResponse> 
+    public interface IRequestHandler<in TRequest, TResponse> where TRequest : IRequest<TResponse> 
     {
         Task<TResponse> HandleAsync(TRequest request);
     }
