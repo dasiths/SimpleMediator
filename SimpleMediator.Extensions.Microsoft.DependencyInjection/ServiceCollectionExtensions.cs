@@ -152,11 +152,19 @@ namespace SimpleMediator.Extensions.Microsoft.DependencyInjection
 
                     foreach (Type interfaceType in interfaceTypes)
                     {
-                        interfaces.Fill(interfaceType);
+                        if (interfaceType.GetInterfaces().Any())
+                        {
+                            // Register the RequestHandler instead of ICommand/Query/EventHandler
+                            interfaces.AddRange(interfaceType.GetInterfaces());
+                        }
+                        else
+                        {
+                            interfaces.Fill(interfaceType);
+                        }
                     }
                 }
 
-                foreach (var @interface in interfaces)
+                foreach (var @interface in interfaces.Distinct())
                 {
                     var matches = concretions
                         .Where(t => t.CanBeCastTo(@interface))
