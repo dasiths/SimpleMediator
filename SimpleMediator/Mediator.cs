@@ -20,8 +20,7 @@ namespace SimpleMediator
         public async Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request)
         {
             var targetType = request.GetType();
-            var targetHandler = typeof(IRequestHandler<,>).MakeGenericType(targetType, typeof(TResponse));
-
+            var targetHandler = typeof(IPipeline<,>).MakeGenericType(targetType, typeof(TResponse));
             var instance = _serviceFactory.GetInstance(targetHandler);
 
             var method = InvokeInstance(instance, request, targetHandler);
@@ -29,22 +28,11 @@ namespace SimpleMediator
             return await method;
         }
 
-        public async Task PublishAsync<TResponse>(IRequest<TResponse> request)
-        {
-            var targetType = request.GetType();
-            var targetHandler = typeof(IRequestHandler<,>).MakeGenericType(targetType, typeof(TResponse));
-
-            var instances = (IEnumerable<object>)_serviceFactory.GetInstance(typeof(IEnumerable<>).MakeGenericType(targetHandler));
-            var methods = instances.Select(instance => InvokeInstance(instance, request, targetHandler));
-
-            await Task.WhenAll(methods);
-        }
-
         private Task<TResponse> InvokeInstance<TResponse>(object instance, IRequest<TResponse> request, Type targetHandler)
         {
             var method = instance.GetType()
                 .GetTypeInfo()
-                .GetMethod(nameof(IRequestHandler<IRequest<TResponse>, TResponse>.HandleAsync));
+                .GetMethod(nameof(IPipeline<IRequest<TResponse>, TResponse>.HandleAsync));
 
             if (method == null)
             {
@@ -52,7 +40,7 @@ namespace SimpleMediator
                     instance.GetType().FullName);
             }
 
-            return (Task<TResponse>) method.Invoke(instance, new object[] {request});
+            return (Task<TResponse>) method.Invoke(instance, new object[] {request, _serviceFactory});
         }
     }
 }

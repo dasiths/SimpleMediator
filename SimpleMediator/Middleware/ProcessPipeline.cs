@@ -1,28 +1,24 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using SimpleMediator.Core;
 
 namespace SimpleMediator.Middleware
 {
-    public class ProcessMiddleware<TResponse> : IMiddleware<IRequest<TResponse>, TResponse>
+    public class ProcessPipeline<TRequest, TResponse> : IPipeline<TRequest, TResponse> where TRequest : IRequest<TResponse>
     {
-        private readonly IServiceFactory _serviceFactory;
+        private readonly IEnumerable<IRequestHandler<TRequest, TResponse>> _requestHandlers;
 
-        public ProcessMiddleware(IServiceFactory serviceFactory)
+        public ProcessPipeline(IEnumerable<IRequestHandler<TRequest, TResponse>> requestHandlers)
         {
-            _serviceFactory = serviceFactory;
+            _requestHandlers = requestHandlers;
         }
 
-        public async Task<TResponse> HandleAsync(IRequest<TResponse> request, RequestHandlerDelegate<TResponse> next)
+        public async Task<TResponse> HandleAsync(TRequest request, IServiceFactory serviceFactory)
         {
-            var targetType = request.GetType();
-            var targetHandler = typeof(IRequestHandler<,>).MakeGenericType(targetType, typeof(TResponse));
-
-            var instance = _serviceFactory.GetInstance(targetHandler);
-            var method = InvokeInstance(instance, request, targetHandler);
-
-            return await method;
+            return await _requestHandlers.First().HandleAsync(request);
         }
 
         private Task<TResponse> InvokeInstance(object instance, IRequest<TResponse> request, Type targetHandler)
