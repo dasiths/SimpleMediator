@@ -50,7 +50,7 @@ namespace SimpleMediator.Middleware
         {
             RequestFilterDelegate<TRequest, TResponse> next = null;
 
-            next = _middlewares.Reverse().Aggregate(requestHandlerCall, (a, b) => (req => b.RunAsync(request, a)));
+            next = _middlewares.Reverse().Aggregate(requestHandlerCall, (a, b) => (req => b.RunAsync(req, a)));
 
             return await next.Invoke(request);
         }
