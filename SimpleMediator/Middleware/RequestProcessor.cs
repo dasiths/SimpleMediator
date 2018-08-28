@@ -10,17 +10,22 @@ namespace SimpleMediator.Middleware
     public class RequestProcessor<TRequest, TResponse> : IRequestProcessor<TRequest, TResponse> where TRequest : IRequest<TResponse>
     {
         private readonly IEnumerable<IRequestHandler<TRequest, TResponse>> _requestHandlers;
+        private readonly IEnumerable<IRequestFilter<TRequest, TResponse>> _requestFilters;
 
-        public RequestProcessor(IEnumerable<IRequestHandler<TRequest, TResponse>> requestHandlers)
+        public RequestProcessor(IEnumerable<IRequestHandler<TRequest, TResponse>> requestHandlers,
+            IEnumerable<IRequestFilter<TRequest, TResponse>> requestFilters)
         {
             _requestHandlers = requestHandlers;
+            _requestFilters = requestFilters;
         }
 
         public async Task<TResponse> HandleAsync(TRequest request, IServiceFactory serviceFactory)
         {
             var type = typeof(TRequest);
 
-            if(typeof(IEvent).IsAssignableFrom(type))
+            await CallRequestFilters(request);
+
+            if (typeof(IEvent).IsAssignableFrom(type))
             {
                 var tasks = _requestHandlers.Select(r => r.HandleAsync(request));
                 var results = await Task.WhenAll(tasks);
@@ -35,6 +40,20 @@ namespace SimpleMediator.Middleware
 
             throw new ArgumentException($"{typeof(TRequest).Name} is not a known type of {typeof(IRequest<>).Name} - Query, Command or Event",
                 typeof(TRequest).FullName);
+        }
+
+        private async Task CallRequestFilters(TRequest request)
+        {
+            RequestFilterDelegate<TRequest> next = req => Task.CompletedTask;
+
+            foreach (var requestFilter in _requestFilters.Reverse())
+            {
+                var nextFunc = next;
+                var chainedFunc = new RequestFilterDelegate<TRequest>(req => requestFilter.FilterAsync(request, nextFunc));
+                next = chainedFunc;
+            }
+
+            await next.Invoke(request);
         }
     }
 }

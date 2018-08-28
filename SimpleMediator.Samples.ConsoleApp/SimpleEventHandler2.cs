@@ -7,7 +7,7 @@ namespace SimpleMediator.Samples.ConsoleApp
     {
         protected override async Task HandleEventAsync(SimpleEvent @event)
         {
-            Console.WriteLine("Event handler 1");
+            Console.WriteLine("Event handler 2");
         }
     }
 }
