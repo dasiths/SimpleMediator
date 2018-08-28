@@ -1,6 +1,7 @@
 ﻿namespace SimpleMediator.Core
 {
-    public interface ICommand: IRequest<Unit>
+    public interface IEvent : IRequest<Unit>
     {
+
     }
 }

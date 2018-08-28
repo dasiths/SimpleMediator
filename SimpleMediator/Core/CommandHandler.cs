@@ -2,14 +2,14 @@
 
 namespace SimpleMediator.Core
 {
-    public abstract class CommandHandler<TCommand> : IRequestHandler<TCommand, Unit> where TCommand : IQuery<Unit>
+    public abstract class CommandHandler<TCommand> : IRequestHandler<TCommand, Unit> where TCommand : IRequest<Unit>
     {
         public async Task<Unit> HandleAsync(TCommand request)
         {
-            await ExecuteAsync(request);
+            await HandleCommandAsync(request);
             return new Unit();
         }
 
-        protected abstract Task ExecuteAsync(TCommand command);
+        protected abstract Task HandleCommandAsync(TCommand command);
     }
 }

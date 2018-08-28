@@ -1,16 +1,19 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using SimpleMediator.Core;
 
 namespace SimpleMediator.Samples.ConsoleApp
 {
-    public class SimpleQueryHandler : IQueryHandler<SimpleQuery, SimpleResponse>
+    public class SimpleQueryHandler : QueryHandler<SimpleQuery, SimpleResponse>
     {
-        public async Task<SimpleResponse> HandleAsync(SimpleQuery query)
+        protected override async Task<SimpleResponse> HandleQueryAsync(SimpleQuery query)
         {
-            return await Task.FromResult(new SimpleResponse()
+            Console.WriteLine("Test query");
+
+            return new SimpleResponse()
             {
-                Message = "Hello World"
-            });
+                Message = "Test query messsage"
+            };
         }
     }
 }

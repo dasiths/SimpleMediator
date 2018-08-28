@@ -28,10 +28,12 @@ namespace SimpleMediator.Samples.ConsoleApp
                 var mediator = container.GetService<Mediator>();
                 var simpleQuery = new SimpleQuery();
                 var simpleCommand = new SimpleCommand();
+                var simpleEvent = new SimpleEvent();
 
                 var result = await mediator.SendAsync(simpleQuery);
                 Console.WriteLine(result.Message);
                 await mediator.SendAsync(simpleCommand);
+                await mediator.SendAsync(simpleEvent);
                 Console.ReadLine();
             }
         }

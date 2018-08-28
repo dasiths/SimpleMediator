@@ -18,7 +18,21 @@ namespace SimpleMediator.Middleware
 
         public async Task<TResponse> HandleAsync(TRequest request, IServiceFactory serviceFactory)
         {
-            return await _requestHandlers.First().HandleAsync(request);
+            var type = typeof(TRequest);
+
+            if (typeof(IQuery<TResponse>).IsAssignableFrom(type) || typeof(ICommand).IsAssignableFrom(type))
+            {
+                return await _requestHandlers.First().HandleAsync(request);
+            }
+            else if(typeof(IEvent).IsAssignableFrom(type))
+            {
+                var tasks = _requestHandlers.Select(r => r.HandleAsync(request));
+                var results = await Task.WhenAll(tasks);
+
+                return results.First();
+            }
+
+            throw new ArgumentException();
         }
 
         private Task<TResponse> InvokeInstance(object instance, IRequest<TResponse> request, Type targetHandler)
