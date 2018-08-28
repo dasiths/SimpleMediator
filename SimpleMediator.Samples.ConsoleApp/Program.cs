@@ -12,6 +12,23 @@ namespace SimpleMediator.Samples.ConsoleApp
     {
         public static async Task Main(string[] args)
         {
+            using (var container = CreateServiceCollection())
+            {
+                var mediator = container.GetService<IMediator>();
+                var simpleQuery = new SimpleQuery();
+                var simpleCommand = new SimpleCommand();
+                var simpleEvent = new SimpleEvent();
+
+                var result = await mediator.SendAsync(simpleQuery);
+                Console.WriteLine(result.Message);
+                await mediator.SendAsync(simpleCommand);
+                await mediator.SendAsync(simpleEvent);
+                Console.ReadLine();
+            }
+        }
+
+        private static ServiceProvider CreateServiceCollection()
+        {
             var services = new ServiceCollection();
 
             foreach (var requestHandler in Assembly.GetEntryAssembly().GetRequestHandlers())
@@ -25,20 +42,7 @@ namespace SimpleMediator.Samples.ConsoleApp
 
             services.AddScoped<IServiceFactory>(s => new Func<Type, object>(s.GetService).ToServiceFactory());
             services.AddScoped<IMediator, Mediator>();
-
-            using (var container = services.BuildServiceProvider())
-            {
-                var mediator = container.GetService<IMediator>();
-                var simpleQuery = new SimpleQuery();
-                var simpleCommand = new SimpleCommand();
-                var simpleEvent = new SimpleEvent();
-
-                var result = await mediator.SendAsync(simpleQuery);
-                Console.WriteLine(result.Message);
-                await mediator.SendAsync(simpleCommand);
-                await mediator.SendAsync(simpleEvent);
-                Console.ReadLine();
-            }
+            return services.BuildServiceProvider();
         }
     }
 }
