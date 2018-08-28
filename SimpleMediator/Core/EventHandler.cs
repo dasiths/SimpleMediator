@@ -7,7 +7,7 @@ namespace SimpleMediator.Core
         public async Task<Unit> HandleAsync(TEvent request)
         {
             await HandleEventAsync(request);
-            return new Unit();
+            return Unit.Result;
         }
 
         protected abstract Task HandleEventAsync(TEvent @event);

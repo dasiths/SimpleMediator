@@ -20,7 +20,7 @@ namespace SimpleMediator
         public async Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request)
         {
             var targetType = request.GetType();
-            var targetHandler = typeof(IPipeline<,>).MakeGenericType(targetType, typeof(TResponse));
+            var targetHandler = typeof(IRequestProcessor<,>).MakeGenericType(targetType, typeof(TResponse));
             var instance = _serviceFactory.GetInstance(targetHandler);
 
             var method = InvokeInstance(instance, request, targetHandler);
@@ -32,7 +32,7 @@ namespace SimpleMediator
         {
             var method = instance.GetType()
                 .GetTypeInfo()
-                .GetMethod(nameof(IPipeline<IRequest<TResponse>, TResponse>.HandleAsync));
+                .GetMethod(nameof(IRequestProcessor<IRequest<TResponse>, TResponse>.HandleAsync));
 
             if (method == null)
             {

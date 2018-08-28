@@ -7,7 +7,7 @@ namespace SimpleMediator.Core
         public async Task<Unit> HandleAsync(TCommand request)
         {
             await HandleCommandAsync(request);
-            return new Unit();
+            return Unit.Result;
         }
 
         protected abstract Task HandleCommandAsync(TCommand command);

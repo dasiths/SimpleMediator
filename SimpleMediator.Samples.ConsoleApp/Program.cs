@@ -19,7 +19,7 @@ namespace SimpleMediator.Samples.ConsoleApp
                 services.AddSingleton(requestHandler.Item1, requestHandler.Item2);
             }
 
-            services.AddScoped(typeof(IPipeline<,>), typeof(ProcessPipeline<,>));
+            services.AddScoped(typeof(IRequestProcessor<,>), typeof(RequestProcessor<,>));
             services.AddScoped<IServiceFactory>(s => new Func<Type, object>(s.GetService).ToServiceFactory());
             services.AddScoped<Mediator>();
 
