@@ -30,10 +30,10 @@ namespace SimpleMediator.Samples.ConsoleApp
                     CurrentTime = DateTimeOffset.Now
                 };
 
-                var result = await mediator.SendAsync(simpleQuery, context);
+                var result = await mediator.HandleAsync(simpleQuery, context);
                 Console.WriteLine(result.Message);
-                await mediator.SendAsync(simpleCommand);
-                await mediator.SendAsync(simpleEvent);
+                await mediator.HandleAsync(simpleCommand);
+                await mediator.HandleAsync(simpleEvent);
                 Console.ReadLine();
             }
         }

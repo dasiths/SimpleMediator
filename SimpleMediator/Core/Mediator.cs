@@ -14,7 +14,7 @@ namespace SimpleMediator.Core
             _serviceFactory = serviceFactory;
         }
 
-        public async Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request, IMediationContext mediationContext = null)
+        public async Task<TResponse> HandleAsync<TResponse>(IRequest<TResponse> request, IMediationContext mediationContext = null)
         {
             if (mediationContext == null)
             {
