@@ -48,14 +48,9 @@ namespace SimpleMediator.Middleware
 
         private async Task<TResponse> RunMiddleware(TRequest request, RequestFilterDelegate<TRequest, TResponse> requestHandlerCall)
         {
-            RequestFilterDelegate<TRequest, TResponse> next = requestHandlerCall;
+            RequestFilterDelegate<TRequest, TResponse> next = null;
 
-            foreach (var requestFilter in _requestFilters.Reverse())
-            {
-                var nextFunc = next;
-                var chainedFunc = new RequestFilterDelegate<TRequest, TResponse>(req => requestFilter.RunAsync(request, nextFunc));
-                next = chainedFunc;
-            }
+            next = _middlewares.Reverse().Aggregate(requestHandlerCall, (a, b) => (req => b.RunAsync(request, a)));
 
             return await next.Invoke(request);
         }
