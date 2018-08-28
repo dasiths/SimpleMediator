@@ -12,13 +12,13 @@ namespace SimpleMediator.Middleware
     public class RequestProcessor<TRequest, TResponse> : IRequestProcessor<TRequest, TResponse> where TRequest : IRequest<TResponse>
     {
         private readonly IEnumerable<IRequestHandler<TRequest, TResponse>> _requestHandlers;
-        private readonly IEnumerable<IMiddleware<TRequest, TResponse>> _requestFilters;
+        private readonly IEnumerable<IMiddleware<TRequest, TResponse>> _middlewares;
 
         public RequestProcessor(IEnumerable<IRequestHandler<TRequest, TResponse>> requestHandlers,
-            IEnumerable<IMiddleware<TRequest, TResponse>> requestFilters)
+            IEnumerable<IMiddleware<TRequest, TResponse>> middlewares)
         {
             _requestHandlers = requestHandlers;
-            _requestFilters = requestFilters;
+            _middlewares = middlewares;
         }
 
         public async Task<TResponse> HandleAsync(TRequest request)
