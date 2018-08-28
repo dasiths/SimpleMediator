@@ -14,18 +14,23 @@ namespace SimpleMediator.Core
             _serviceFactory = serviceFactory;
         }
 
-        public async Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request)
+        public async Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request, IMediationContext mediationContext = null)
         {
+            if (mediationContext == null)
+            {
+                mediationContext = new MediationContext();
+            }
+
             var targetType = request.GetType();
             var targetHandler = typeof(IRequestProcessor<,>).MakeGenericType(targetType, typeof(TResponse));
             var instance = _serviceFactory.GetInstance(targetHandler);
 
-            var method = InvokeInstance(instance, request, targetHandler);
+            var method = InvokeInstance(instance, request, targetHandler, mediationContext);
 
             return await method;
         }
 
-        private Task<TResponse> InvokeInstance<TResponse>(object instance, IRequest<TResponse> request, Type targetHandler)
+        private Task<TResponse> InvokeInstance<TResponse>(object instance, IRequest<TResponse> request, Type targetHandler, IMediationContext mediationContext)
         {
             var method = instance.GetType()
                 .GetTypeInfo()
@@ -37,7 +42,7 @@ namespace SimpleMediator.Core
                     instance.GetType().FullName);
             }
 
-            return (Task<TResponse>) method.Invoke(instance, new object[] {request});
+            return (Task<TResponse>) method.Invoke(instance, new object[] {request, mediationContext});
         }
     }
 }

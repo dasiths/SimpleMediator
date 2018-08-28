@@ -19,7 +19,12 @@ namespace SimpleMediator.Samples.ConsoleApp
                 var simpleCommand = new SimpleCommand();
                 var simpleEvent = new SimpleEvent();
 
-                var result = await mediator.SendAsync(simpleQuery);
+                var context = new SimpleMediationContext()
+                {
+                    CurrentTime = DateTimeOffset.Now
+                };
+
+                var result = await mediator.SendAsync(simpleQuery, context);
                 Console.WriteLine(result.Message);
                 await mediator.SendAsync(simpleCommand);
                 await mediator.SendAsync(simpleEvent);
