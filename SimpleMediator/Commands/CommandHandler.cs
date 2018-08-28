@@ -3,7 +3,7 @@ using SimpleMediator.Core;
 
 namespace SimpleMediator.Commands
 {
-    public abstract class CommandHandler<TCommand> : IRequestHandler<TCommand, Unit> where TCommand : IRequest<Unit>
+    public abstract class CommandHandler<TCommand> : ICommandHandler<TCommand> where TCommand : IRequest<Unit>
     {
         public async Task<Unit> HandleAsync(TCommand request)
         {

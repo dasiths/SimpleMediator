@@ -3,7 +3,7 @@ using SimpleMediator.Core;
 
 namespace SimpleMediator.Queries
 {
-    public abstract class QueryHandler<TQuery, TResponse> : IRequestHandler<TQuery, TResponse> where TQuery : IRequest<TResponse>
+    public abstract class QueryHandler<TQuery, TResponse> : IQueryHandler<TQuery, TResponse> where TQuery : IRequest<TResponse>
     {
         public async Task<TResponse> HandleAsync(TQuery request)
         {

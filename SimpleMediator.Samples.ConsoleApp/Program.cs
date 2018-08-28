@@ -4,13 +4,19 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleMediator.Core;
 using SimpleMediator.Extensions;
+using SimpleMediator.Extensions.Microsoft.DependencyInjection;
 using SimpleMediator.Middleware;
 
 namespace SimpleMediator.Samples.ConsoleApp
 {
     public class Program
     {
-        public static async Task Main(string[] args)
+        public static void Main(string[] args)
+        {
+            RunSample().ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+
+        public static async Task RunSample()
         {
             using (var container = CreateServiceCollection())
             {
@@ -36,17 +42,23 @@ namespace SimpleMediator.Samples.ConsoleApp
         {
             var services = new ServiceCollection();
 
-            foreach (var requestHandler in Assembly.GetEntryAssembly().GetRequestHandlers())
-            {
-                services.AddSingleton(requestHandler.Item1, requestHandler.Item2);
-            }
-
+            /* If doing manually
             services.AddScoped(typeof(IRequestProcessor<,>), typeof(RequestProcessor<,>));
-            services.AddScoped(typeof(IMiddleware<,>), typeof(LoggerMiddleware1<,>));
-            services.AddScoped(typeof(IMiddleware<,>), typeof(LoggerMiddleware2<,>));
             services.AddScoped<ServiceFactoryDelegate>(s => s.GetService);
             services.AddScoped<IServiceFactory, ServiceFactory>();
             services.AddScoped<IMediator, Mediator>();
+
+            foreach (var requestHandler in Assembly.GetEntryAssembly().GetRequestHandlers())
+            {
+                services.AddTransient(requestHandler.Item1, requestHandler.Item2);
+            }
+
+            services.AddTransient(typeof(IMiddleware<,>), typeof(LoggerMiddleware1<,>));
+            services.AddTransient(typeof(IMiddleware<,>), typeof(LoggerMiddleware2<,>));
+            */
+
+            services.AddSimpleMediator();
+
             return services.BuildServiceProvider();
         }
     }

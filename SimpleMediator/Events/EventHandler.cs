@@ -3,7 +3,7 @@ using SimpleMediator.Core;
 
 namespace SimpleMediator.Events
 {
-    public abstract class EventHandler<TEvent> : IRequestHandler<TEvent, Unit> where TEvent : IRequest<Unit>
+    public abstract class EventHandler<TEvent> : IEventHandler<TEvent> where TEvent : IRequest<Unit>
     {
         public async Task<Unit> HandleAsync(TEvent request)
         {

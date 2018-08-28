@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <LangVersion>7.1</LangVersion>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SimpleMediator.Extensions.Microsoft.DependencyInjection\SimpleMediator.Extensions.Microsoft.DependencyInjection.csproj" />
     <ProjectReference Include="..\SimpleMediator\SimpleMediator.csproj" />
   </ItemGroup>
 
