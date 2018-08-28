@@ -7,16 +7,16 @@ namespace SimpleMediator.Core
 
     public class ServiceFactory : IServiceFactory
     {
-        private readonly Func<Type, object> _factoryFunc;
+        private readonly ServiceFactoryDelegate _serviceFactoryDelegate;
 
-        public ServiceFactory(Func<Type, object> factoryFunc)
+        public ServiceFactory(ServiceFactoryDelegate serviceFactoryDelegate)
         {
-            _factoryFunc = factoryFunc;
+            _serviceFactoryDelegate = serviceFactoryDelegate;
         }
 
         public object GetInstance(Type T)
         {
-            return _factoryFunc.Invoke(T);
+            return _serviceFactoryDelegate.Invoke(T);
         }
     }
 }
