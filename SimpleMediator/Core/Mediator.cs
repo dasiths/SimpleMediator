@@ -37,7 +37,7 @@ namespace SimpleMediator.Core
                     instance.GetType().FullName);
             }
 
-            return (Task<TResponse>) method.Invoke(instance, new object[] {request, _serviceFactory});
+            return (Task<TResponse>) method.Invoke(instance, new object[] {request});
         }
     }
 }

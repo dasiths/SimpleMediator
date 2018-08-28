@@ -21,32 +21,32 @@ namespace SimpleMediator.Middleware
             _requestFilters = requestFilters;
         }
 
-        public async Task<TResponse> HandleAsync(TRequest request, IServiceFactory serviceFactory)
+        public async Task<TResponse> HandleAsync(TRequest request)
+        {
+            return await RunMiddleware(request, HandleRequest);
+        }
+
+        private async Task<TResponse> HandleRequest(TRequest requestObject)
         {
             var type = typeof(TRequest);
 
-            async Task<TResponse> RequestHandlerCall(TRequest requestObject)
+            if (typeof(IEvent).IsAssignableFrom(type))
             {
-                if (typeof(IEvent).IsAssignableFrom(type))
-                {
-                    var tasks = _requestHandlers.Select(r => r.HandleAsync(requestObject));
-                    var results = await Task.WhenAll(tasks);
+                var tasks = _requestHandlers.Select(r => r.HandleAsync(requestObject));
+                var results = await Task.WhenAll(tasks);
 
-                    return results.First();
-                }
-
-                if (typeof(IQuery<TResponse>).IsAssignableFrom(type) || typeof(ICommand).IsAssignableFrom(type))
-                {
-                    return await _requestHandlers.Single().HandleAsync(requestObject);
-                }
-
-                throw new ArgumentException($"{typeof(TRequest).Name} is not a known type of {typeof(IRequest<>).Name} - Query, Command or Event", typeof(TRequest).FullName);
+                return results.First();
             }
 
-            return await CallRequestFilters(request, RequestHandlerCall);
+            if (typeof(IQuery<TResponse>).IsAssignableFrom(type) || typeof(ICommand).IsAssignableFrom(type))
+            {
+                return await _requestHandlers.Single().HandleAsync(requestObject);
+            }
+
+            throw new ArgumentException($"{typeof(TRequest).Name} is not a known type of {typeof(IRequest<>).Name} - Query, Command or Event", typeof(TRequest).FullName);
         }
 
-        private async Task<TResponse> CallRequestFilters(TRequest request, RequestFilterDelegate<TRequest, TResponse> requestHandlerCall)
+        private async Task<TResponse> RunMiddleware(TRequest request, RequestFilterDelegate<TRequest, TResponse> requestHandlerCall)
         {
             RequestFilterDelegate<TRequest, TResponse> next = requestHandlerCall;
 
