@@ -20,15 +20,15 @@ namespace SimpleMediator.Samples.ConsoleApp
             }
 
             services.AddScoped(typeof(IRequestProcessor<,>), typeof(RequestProcessor<,>));
-            services.AddScoped(typeof(IRequestFilter<,>), typeof(LoggerRequestFilter1<,>));
-            services.AddScoped(typeof(IRequestFilter<,>), typeof(LoggerRequestFilter2<,>));
+            services.AddScoped(typeof(IMiddleware<,>), typeof(LoggerMiddleware1<,>));
+            services.AddScoped(typeof(IMiddleware<,>), typeof(LoggerMiddleware2<,>));
 
             services.AddScoped<IServiceFactory>(s => new Func<Type, object>(s.GetService).ToServiceFactory());
-            services.AddScoped<Mediator>();
+            services.AddScoped<IMediator, Mediator>();
 
             using (var container = services.BuildServiceProvider())
             {
-                var mediator = container.GetService<Mediator>();
+                var mediator = container.GetService<IMediator>();
                 var simpleQuery = new SimpleQuery();
                 var simpleCommand = new SimpleCommand();
                 var simpleEvent = new SimpleEvent();

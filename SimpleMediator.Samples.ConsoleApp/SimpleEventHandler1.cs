@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace SimpleMediator.Samples.ConsoleApp
 {
-    public class SimpleEventHandler1 : Core.EventHandler<SimpleEvent>
+    public class SimpleEventHandler1 : Events.EventHandler<SimpleEvent>
     {
         protected override async Task HandleEventAsync(SimpleEvent @event)
         {

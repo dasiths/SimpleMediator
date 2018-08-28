@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SimpleMediator.Core;
-using SimpleMediator.Middleware;
+using SimpleMediator.Queries;
 
 namespace SimpleMediator.Extensions
 {

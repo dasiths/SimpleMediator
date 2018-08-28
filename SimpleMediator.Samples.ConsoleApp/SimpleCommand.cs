@@ -1,4 +1,5 @@
-﻿using SimpleMediator.Core;
+﻿using SimpleMediator.Commands;
+using SimpleMediator.Core;
 
 namespace SimpleMediator.Samples.ConsoleApp
 {

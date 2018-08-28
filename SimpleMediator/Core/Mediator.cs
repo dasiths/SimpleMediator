@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using SimpleMediator.Core;
 using SimpleMediator.Middleware;
 
-namespace SimpleMediator
+namespace SimpleMediator.Core
 {
-    public class Mediator
+    public class Mediator : IMediator
     {
         private readonly IServiceFactory _serviceFactory;
 

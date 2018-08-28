@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
+using SimpleMediator.Core;
 
-namespace SimpleMediator.Core
+namespace SimpleMediator.Queries
 {
     public abstract class QueryHandler<TQuery, TResponse> : IRequestHandler<TQuery, TResponse> where TQuery : IRequest<TResponse>
     {

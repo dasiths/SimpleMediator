@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using SimpleMediator.Core;
+using SimpleMediator.Queries;
 
 namespace SimpleMediator.Samples.ConsoleApp
 {
