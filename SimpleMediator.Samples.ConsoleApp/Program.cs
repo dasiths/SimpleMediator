@@ -74,7 +74,14 @@ namespace SimpleMediator.Samples.ConsoleApp
 
             foreach (var middlewareType in middlewareTypes)
             {
-                builder.RegisterGeneric(middlewareType).AsImplementedInterfaces();
+                if (middlewareType.IsGenericType)
+                {
+                    builder.RegisterGeneric(middlewareType).AsImplementedInterfaces();
+                }
+                else
+                {
+                    builder.RegisterType(middlewareType).AsImplementedInterfaces();
+                }
             }
 
             builder.Register<ServiceFactoryDelegate>(c =>

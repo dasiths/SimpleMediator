@@ -117,7 +117,22 @@ namespace SimpleMediator.Extensions.Microsoft.DependencyInjection
 
                 // Always add every middleware
                 concretions
-                    .ForEach(c => services.AddTransient(multiOpenInterface, c));
+                    .ForEach(c =>
+                    {
+                        if (!c.IsGenericType)
+                        {
+                            IEnumerable<Type> interfaceTypes = c.FindInterfacesThatClose(multiOpenInterface).ToArray();
+
+                            foreach (var type in interfaceTypes)
+                            {
+                                services.AddTransient(type, c);
+                            }
+                        }
+                        else
+                        {
+                            services.AddTransient(multiOpenInterface, c);
+                        }
+                    });
             }
         }
 
