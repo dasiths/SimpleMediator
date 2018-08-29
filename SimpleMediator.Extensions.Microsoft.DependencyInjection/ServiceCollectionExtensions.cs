@@ -132,6 +132,10 @@ namespace SimpleMediator.Extensions.Microsoft.DependencyInjection
                         {
                             services.AddTransient(multiOpenInterface, c);
                         }
+
+                        // This is needed because MS DI doesn't support constrained items,
+                        // the service factory method registered in this class catches the argument exception and tries to resolve implemented types
+                        services.AddTransient(c);
                     });
             }
         }
