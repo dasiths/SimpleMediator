@@ -16,22 +16,25 @@ namespace SimpleMediator.Samples.MassTransit
             {
                 var mediator = container.Resolve<IMediator>();
 
-                mediator.HandleAsync(new SimpleQuery()).ConfigureAwait(false).GetAwaiter().GetResult();
-
                 var busControl = Bus.Factory.CreateUsingInMemory(x =>
-                {
-                    x.ReceiveEndpoint("test_queue", ep => { ep.Consumer<RequestConsumer>(); });
-                });
+                 {
+                     x.ReceiveEndpoint("test_queue", ep => { ep.Consumer<RequestConsumer>(); });
+                 });
 
                 busControl.Start();
 
-                var client = CreateRequestClient(busControl);
-                var result = client.Request(new SimpleMassTransitMessage()
+                var request = new SimpleMassTransitMessage()
                 {
                     Message = DateTime.Now.ToString()
-                }).ConfigureAwait(false).GetAwaiter().GetResult();
+                };
+
+                var client = CreateRequestClient(busControl);
+                var result = client.Request(request).ConfigureAwait(false).GetAwaiter().GetResult();
 
                 Console.WriteLine(result.Message);
+
+                var response = mediator.HandleAsync(request).ConfigureAwait(false).GetAwaiter().GetResult();
+                Console.WriteLine(response.Message);
 
                 Console.ReadLine();
 

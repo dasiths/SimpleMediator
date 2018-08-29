@@ -7,7 +7,7 @@ namespace SimpleMediator.Samples.ConsoleApp
 {
     public class SimpleQueryHandler : QueryHandler<SimpleQuery, SimpleResponse>
     {
-        protected override async Task<SimpleResponse> HandleQueryAsync(SimpleQuery query)
+        protected override async Task<SimpleResponse> HandleQueryAsync(SimpleQuery query, IMediationContext mediationContext)
         {
             Console.WriteLine("Test query");
 

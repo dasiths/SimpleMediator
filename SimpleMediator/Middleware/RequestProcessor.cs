@@ -28,7 +28,7 @@ namespace SimpleMediator.Middleware
             return await RunMiddleware(request, HandleRequest, mediationContext);
         }
 
-        private async Task<TResponse> HandleRequest(TRequest requestObject)
+        private async Task<TResponse> HandleRequest(TRequest requestObject, IMediationContext mediationContext)
         {
             var type = typeof(TRequest);
 
@@ -39,7 +39,7 @@ namespace SimpleMediator.Middleware
 
             if (typeof(IEvent).IsAssignableFrom(type))
             {
-                var tasks = _requestHandlers.Select(r => r.HandleAsync(requestObject));
+                var tasks = _requestHandlers.Select(r => r.HandleAsync(requestObject, mediationContext));
                 var results = await Task.WhenAll(tasks);
 
                 return results.First();
@@ -47,7 +47,7 @@ namespace SimpleMediator.Middleware
 
             if (typeof(IQuery<TResponse>).IsAssignableFrom(type) || typeof(ICommand).IsAssignableFrom(type))
             {
-                return await _requestHandlers.Single().HandleAsync(requestObject);
+                return await _requestHandlers.Single().HandleAsync(requestObject, mediationContext);
             }
 
             throw new ArgumentException($"{typeof(TRequest).Name} is not a known type of {typeof(IRequest<>).Name} - Query, Command or Event", typeof(TRequest).FullName);
@@ -57,9 +57,9 @@ namespace SimpleMediator.Middleware
         {
             HandleRequestDelegate<TRequest, TResponse> next = null;
 
-            next = _middlewares.Reverse().Aggregate(handleRequestHandlerCall, (a, b) => (req => b.RunAsync(req, a, mediationContext)));
+            next = _middlewares.Reverse().Aggregate(handleRequestHandlerCall, (a, b) => ((req, ctx) => b.RunAsync(req, ctx, a)));
 
-            return await next.Invoke(request);
+            return await next.Invoke(request, mediationContext);
         }
     }
 }

@@ -9,10 +9,10 @@ namespace SimpleMediator.Samples.ConsoleApp
 {
     public class SimpleValidator: IMiddleware<SimpleQuery, SimpleResponse>
     {
-        public async Task<SimpleResponse> RunAsync(SimpleQuery request, HandleRequestDelegate<SimpleQuery, SimpleResponse> next, IMediationContext mediationContext)
+        public async Task<SimpleResponse> RunAsync(SimpleQuery request, IMediationContext mediationContext, HandleRequestDelegate<SimpleQuery, SimpleResponse> next)
         {
             Console.WriteLine("Validation hit");
-            return await next.Invoke(request);
+            return await next.Invoke(request, mediationContext);
         }
     }
 }
