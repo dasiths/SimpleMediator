@@ -50,7 +50,7 @@ namespace SimpleMediator.Samples.ConsoleApp
             Console.ReadLine();
         }
 
-        private static ServiceProvider CreateServiceCollection()
+        public static ServiceProvider CreateServiceCollection()
         {
             var services = new ServiceCollection();
             services.AddSimpleMediator();
@@ -58,29 +58,32 @@ namespace SimpleMediator.Samples.ConsoleApp
             return services.BuildServiceProvider();
         }
 
-        private static IContainer CreateAutofacContainer()
+        public static IContainer CreateAutofacContainer()
         {
-            var assembly = Assembly.GetEntryAssembly();
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.IsDynamic);
             var builder = new ContainerBuilder();
 
-            builder.RegisterAssemblyTypes(assembly).AsClosedTypesOf(typeof(IRequestHandler<,>)).AsImplementedInterfaces();
-
-            var middlewareTypes = assembly.GetTypes().Where(t =>
+            foreach (var assembly in assemblies)
             {
-                return t.GetTypeInfo()
-                    .ImplementedInterfaces.Any(
-                        i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IMiddleware<,>));
-            });
+                builder.RegisterAssemblyTypes(assembly).AsClosedTypesOf(typeof(IRequestHandler<,>)).AsImplementedInterfaces();
 
-            foreach (var middlewareType in middlewareTypes)
-            {
-                if (middlewareType.IsGenericType)
+                var middlewareTypes = assembly.GetTypes().Where(t =>
                 {
-                    builder.RegisterGeneric(middlewareType).AsImplementedInterfaces();
-                }
-                else
+                    return t.GetTypeInfo()
+                        .ImplementedInterfaces.Any(
+                            i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IMiddleware<,>));
+                });
+
+                foreach (var middlewareType in middlewareTypes)
                 {
-                    builder.RegisterType(middlewareType).AsImplementedInterfaces();
+                    if (middlewareType.IsGenericType)
+                    {
+                        builder.RegisterGeneric(middlewareType).AsImplementedInterfaces();
+                    }
+                    else
+                    {
+                        builder.RegisterType(middlewareType).AsImplementedInterfaces();
+                    }
                 }
             }
 
