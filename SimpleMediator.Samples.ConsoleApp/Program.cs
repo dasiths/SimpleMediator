@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleMediator.Core;
-using SimpleMediator.Extensions;
 using SimpleMediator.Extensions.Microsoft.DependencyInjection;
 using SimpleMediator.Middleware;
 
@@ -21,45 +22,71 @@ namespace SimpleMediator.Samples.ConsoleApp
             using (var container = CreateServiceCollection())
             {
                 var mediator = container.GetService<IMediator>();
-                var simpleQuery = new SimpleQuery();
-                var simpleCommand = new SimpleCommand();
-                var simpleEvent = new SimpleEvent();
-
-                var context = new SimpleMediationContext()
-                {
-                    CurrentTime = DateTimeOffset.Now
-                };
-
-                var result = await mediator.HandleAsync(simpleQuery, context);
-                Console.WriteLine(result.Message);
-                await mediator.HandleAsync(simpleCommand);
-                await mediator.HandleAsync(simpleEvent);
-                Console.ReadLine();
+                await SendCommands(mediator);
             }
+
+            using (var container = CreateAutofacContainer())
+            {
+                var mediator = container.Resolve<IMediator>();
+                await SendCommands(mediator);
+            }
+        }
+
+        private static async Task SendCommands(IMediator mediator)
+        {
+            var simpleQuery = new SimpleQuery();
+            var simpleCommand = new SimpleCommand();
+            var simpleEvent = new SimpleEvent();
+
+            var context = new SimpleMediationContext()
+            {
+                CurrentTime = DateTimeOffset.Now
+            };
+
+            var result = await mediator.HandleAsync(simpleQuery, context);
+            Console.WriteLine(result.Message);
+            await mediator.HandleAsync(simpleCommand);
+            await mediator.HandleAsync(simpleEvent);
+            Console.ReadLine();
         }
 
         private static ServiceProvider CreateServiceCollection()
         {
             var services = new ServiceCollection();
-
-            /* If doing manually
-            services.AddScoped(typeof(IRequestProcessor<,>), typeof(RequestProcessor<,>));
-            services.AddScoped<ServiceFactoryDelegate>(s => s.GetService);
-            services.AddScoped<IServiceFactory, ServiceFactory>();
-            services.AddScoped<IMediator, Mediator>();
-
-            foreach (var requestHandler in Assembly.GetEntryAssembly().GetRequestHandlers())
-            {
-                services.AddTransient(requestHandler.Item1, requestHandler.Item2);
-            }
-
-            services.AddTransient(typeof(IMiddleware<,>), typeof(LoggerMiddleware1<,>));
-            services.AddTransient(typeof(IMiddleware<,>), typeof(LoggerMiddleware2<,>));
-            */
-
             services.AddSimpleMediator();
 
             return services.BuildServiceProvider();
+        }
+
+        private static IContainer CreateAutofacContainer()
+        {
+            var assembly = Assembly.GetEntryAssembly();
+            var builder = new ContainerBuilder();
+
+            builder.RegisterAssemblyTypes(assembly).AsClosedTypesOf(typeof(IRequestHandler<,>)).AsImplementedInterfaces();
+
+            var middlewareTypes = assembly.GetTypes().Where(t =>
+            {
+                return t.GetTypeInfo()
+                    .ImplementedInterfaces.Any(
+                        i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IMiddleware<,>));
+            });
+
+            foreach (var middlewareType in middlewareTypes)
+            {
+                builder.RegisterGeneric(middlewareType).AsImplementedInterfaces();
+            }
+
+            builder.Register<ServiceFactoryDelegate>(c =>
+            {
+                var context = c.Resolve<IComponentContext>();
+                return context.Resolve;
+            });
+            builder.RegisterType<ServiceFactory>().AsImplementedInterfaces();
+            builder.RegisterType<Mediator>().AsImplementedInterfaces();
+            builder.RegisterGeneric(typeof(RequestProcessor<,>)).AsImplementedInterfaces();
+
+            return builder.Build();
         }
     }
 }
