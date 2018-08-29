@@ -25,9 +25,9 @@ namespace SimpleMediator.Core
             var targetHandler = typeof(IRequestProcessor<,>).MakeGenericType(targetType, typeof(TResponse));
             var instance = _serviceFactory.GetInstance(targetHandler);
 
-            var method = InvokeInstance(instance, request, targetHandler, mediationContext);
+            var result = InvokeInstance(instance, request, targetHandler, mediationContext);
 
-            return await method;
+            return await result;
         }
 
         private Task<TResponse> InvokeInstance<TResponse>(object instance, IRequest<TResponse> request, Type targetHandler, IMediationContext mediationContext)

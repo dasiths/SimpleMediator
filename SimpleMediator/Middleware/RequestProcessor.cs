@@ -32,6 +32,11 @@ namespace SimpleMediator.Middleware
         {
             var type = typeof(TRequest);
 
+            if (!_requestHandlers.Any())
+            {
+                throw new ArgumentException($"No handler of signature {typeof(IRequestHandler<,>).Name} was found for {typeof(TRequest).Name}", typeof(TRequest).FullName);
+            }
+
             if (typeof(IEvent).IsAssignableFrom(type))
             {
                 var tasks = _requestHandlers.Select(r => r.HandleAsync(requestObject));
