@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using SimpleMediator.Middleware;
 
@@ -14,7 +15,8 @@ namespace SimpleMediator.Core
             _serviceFactory = serviceFactory;
         }
 
-        public async Task<TResponse> HandleAsync<TResponse>(IRequest<TResponse> request, IMediationContext mediationContext = null)
+        public async Task<TResponse> HandleAsync<TResponse>(IRequest<TResponse> request,
+            IMediationContext mediationContext = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (mediationContext == null)
             {
@@ -25,12 +27,13 @@ namespace SimpleMediator.Core
             var targetHandler = typeof(IRequestProcessor<,>).MakeGenericType(targetType, typeof(TResponse));
             var instance = _serviceFactory.GetInstance(targetHandler);
 
-            var result = InvokeInstance(instance, request, targetHandler, mediationContext);
+            var result = InvokeInstance(instance, request, targetHandler, mediationContext, cancellationToken);
 
             return await result;
         }
 
-        private Task<TResponse> InvokeInstance<TResponse>(object instance, IRequest<TResponse> request, Type targetHandler, IMediationContext mediationContext)
+        private Task<TResponse> InvokeInstance<TResponse>(object instance, IRequest<TResponse> request, Type targetHandler, 
+            IMediationContext mediationContext, CancellationToken cancellationToken)
         {
             var method = instance.GetType()
                 .GetTypeInfo()
@@ -42,7 +45,7 @@ namespace SimpleMediator.Core
                     instance.GetType().FullName);
             }
 
-            return (Task<TResponse>) method.Invoke(instance, new object[] {request, mediationContext});
+            return (Task<TResponse>) method.Invoke(instance, new object[] {request, mediationContext, cancellationToken});
         }
     }
 }

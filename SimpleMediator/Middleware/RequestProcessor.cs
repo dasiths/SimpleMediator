@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using SimpleMediator.Commands;
 using SimpleMediator.Core;
@@ -23,12 +24,13 @@ namespace SimpleMediator.Middleware
                 serviceFactory.GetInstance(typeof(IEnumerable<IMiddleware<TRequest, TResponse>>));
         }
 
-        public async Task<TResponse> HandleAsync(TRequest request, IMediationContext mediationContext)
+        public async Task<TResponse> HandleAsync(TRequest request, IMediationContext mediationContext,
+            CancellationToken cancellationToken)
         {
-            return await RunMiddleware(request, HandleRequest, mediationContext);
+            return await RunMiddleware(request, HandleRequest, mediationContext, cancellationToken);
         }
 
-        private async Task<TResponse> HandleRequest(TRequest requestObject, IMediationContext mediationContext)
+        private async Task<TResponse> HandleRequest(TRequest requestObject, IMediationContext mediationContext, CancellationToken cancellationToken)
         {
             var type = typeof(TRequest);
 
@@ -39,7 +41,7 @@ namespace SimpleMediator.Middleware
 
             if (typeof(IEvent).IsAssignableFrom(type))
             {
-                var tasks = _requestHandlers.Select(r => r.HandleAsync(requestObject, mediationContext));
+                var tasks = _requestHandlers.Select(r => r.HandleAsync(requestObject, mediationContext, cancellationToken));
                 var results = await Task.WhenAll(tasks);
 
                 return results.First();
@@ -47,19 +49,21 @@ namespace SimpleMediator.Middleware
 
             if (typeof(IQuery<TResponse>).IsAssignableFrom(type) || typeof(ICommand).IsAssignableFrom(type))
             {
-                return await _requestHandlers.Single().HandleAsync(requestObject, mediationContext);
+                return await _requestHandlers.Single().HandleAsync(requestObject, mediationContext, cancellationToken);
             }
 
             throw new ArgumentException($"{typeof(TRequest).Name} is not a known type of {typeof(IRequest<>).Name} - Query, Command or Event", typeof(TRequest).FullName);
         }
 
-        private async Task<TResponse> RunMiddleware(TRequest request, HandleRequestDelegate<TRequest, TResponse> handleRequestHandlerCall, IMediationContext mediationContext)
+        private async Task<TResponse> RunMiddleware(TRequest request, HandleRequestDelegate<TRequest, TResponse> handleRequestHandlerCall, 
+            IMediationContext mediationContext, CancellationToken cancellationToken)
         {
             HandleRequestDelegate<TRequest, TResponse> next = null;
 
-            next = _middlewares.Reverse().Aggregate(handleRequestHandlerCall, (a, b) => ((req, ctx) => b.RunAsync(req, ctx, a)));
+            next = _middlewares.Reverse().Aggregate(handleRequestHandlerCall, (requestDelegate, middleware) =>
+                ((req, ctx, ct) => middleware.RunAsync(req, ctx, ct, requestDelegate)));
 
-            return await next.Invoke(request, mediationContext);
+            return await next.Invoke(request, mediationContext, cancellationToken);
         }
     }
 }
