@@ -6,7 +6,7 @@ using SimpleMediator.Middleware;
 
 namespace SimpleMediator.Samples.MassTransit
 {
-    public class MassTransitRequestMiddleware<TRequest, TResponse> : IMiddleware<TRequest, TResponse> where TRequest : class, IRequest<TResponse> where TResponse : class
+    public class MassTransitMediationMiddleware<TRequest, TResponse> : IMiddleware<TRequest, TResponse> where TRequest : class, IRequest<TResponse> where TResponse : class
     {
         public async Task<TResponse> RunAsync(TRequest request, IMediationContext mediationContext,
             CancellationToken cancellationToken, HandleRequestDelegate<TRequest, TResponse> next)

@@ -5,11 +5,11 @@ using SimpleMediator.Core;
 
 namespace SimpleMediator.Samples.MassTransit
 {
-    public class MassTransitConnectedConsumer<TRequest, TResponse> : IConsumer<TRequest> where TRequest : class, IRequest<TResponse> where TResponse : class
+    public class MassTransitMediatedConsumer<TRequest, TResponse> : IConsumer<TRequest> where TRequest : class, IRequest<TResponse> where TResponse : class
     {
         private readonly IMediator _mediator;
 
-        public MassTransitConnectedConsumer(IMediator mediator)
+        public MassTransitMediatedConsumer(IMediator mediator)
         {
             _mediator = mediator;
         }

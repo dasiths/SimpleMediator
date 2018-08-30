@@ -12,23 +12,23 @@ namespace SimpleMediator.Samples.MassTransit
         {
             Console.WriteLine("Hello World!");
 
+            var request = new SimpleMassTransitMessage()
+            {
+                Message = DateTime.Now.ToString()
+            };
+
+            var queueName = typeof(SimpleMassTransitMessage).Name;
+
             using (var container = ConsoleApp.Program.CreateAutofacContainer())
             {
                 var mediator = container.Resolve<IMediator>();
-
-                var request = new SimpleMassTransitMessage()
-                {
-                    Message = DateTime.Now.ToString()
-                };
-
-                var queueName = typeof(SimpleMassTransitMessage).Name;
 
                 var busControl = Bus.Factory.CreateUsingInMemory(x =>
                  {
                      x.ReceiveEndpoint(queueName, ep =>
                      {
                          ep.Consumer(() =>
-                             new MassTransitConnectedConsumer<SimpleMassTransitMessage, SimpleMassTransitResponse>(mediator)
+                             new MassTransitMediatedConsumer<SimpleMassTransitMessage, SimpleMassTransitResponse>(mediator)
                          );
                      });
                  });
