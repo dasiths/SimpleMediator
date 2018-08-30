@@ -16,39 +16,37 @@ namespace SimpleMediator.Samples.MassTransit
             {
                 var mediator = container.Resolve<IMediator>();
 
-                var busControl = Bus.Factory.CreateUsingInMemory(x =>
-                 {
-                     x.ReceiveEndpoint("test_queue", ep => { ep.Consumer<RequestConsumer>(); });
-                 });
-
-                busControl.Start();
-
                 var request = new SimpleMassTransitMessage()
                 {
                     Message = DateTime.Now.ToString()
                 };
 
-                var client = CreateRequestClient(busControl);
-                var result = client.Request(request).ConfigureAwait(false).GetAwaiter().GetResult();
+                var queueName = typeof(SimpleMassTransitMessage).Name;
+
+                var busControl = Bus.Factory.CreateUsingInMemory(x =>
+                 {
+                     x.ReceiveEndpoint(queueName, ep =>
+                     {
+                         ep.Consumer(() =>
+                             new MassTransitConnectedConsumer<SimpleMassTransitMessage, SimpleMassTransitResponse>(mediator)
+                         );
+                     });
+                 });
+
+                busControl.Start();
+
+                var context = new MassTransitMediationContext<SimpleMassTransitMessage, SimpleMassTransitResponse>(busControl,
+                    new Uri($"loopback://localhost/{queueName}"),
+                    TimeSpan.FromSeconds(10));
+
+                var result = mediator.HandleAsync(request, context).ConfigureAwait(false).GetAwaiter().GetResult();
 
                 Console.WriteLine(result.Message);
-
-                var response = mediator.HandleAsync(request).ConfigureAwait(false).GetAwaiter().GetResult();
-                Console.WriteLine(response.Message);
 
                 Console.ReadLine();
 
                 busControl.Stop();
             }
-        }
-
-        static IRequestClient<SimpleMassTransitMessage, SimpleMassTransitResponse> CreateRequestClient(IBusControl busControl)
-        {
-            var serviceAddress = new Uri("loopback://localhost/test_queue");
-            var client =
-                busControl.CreateRequestClient<SimpleMassTransitMessage, SimpleMassTransitResponse>(serviceAddress, TimeSpan.FromSeconds(10));
-
-            return client;
         }
     }
 }
