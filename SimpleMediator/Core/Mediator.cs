@@ -16,11 +16,11 @@ namespace SimpleMediator.Core
         }
 
         public async Task<TResponse> HandleAsync<TResponse>(IRequest<TResponse> request,
-            IMediationContext mediationContext = null, CancellationToken cancellationToken = default(CancellationToken))
+            IMediationContext mediationContext = default(MediationContext), CancellationToken cancellationToken = default(CancellationToken))
         {
             if (mediationContext == null)
             {
-                mediationContext = new MediationContext();
+                mediationContext = MediationContext.Default;
             }
 
             var targetType = request.GetType();
