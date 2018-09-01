@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SimpleMediator.Core;
 using SimpleMediator.Middleware;
+using SimpleMediator.Samples.Shared;
 
 namespace SimpleMediator.Samples.ConsoleApp
 {

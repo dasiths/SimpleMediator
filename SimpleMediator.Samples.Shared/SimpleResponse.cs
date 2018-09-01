@@ -1,4 +1,4 @@
-﻿namespace SimpleMediator.Samples.ConsoleApp
+﻿namespace SimpleMediator.Samples.Shared
 {
     public class SimpleResponse: ValidationResult
     {

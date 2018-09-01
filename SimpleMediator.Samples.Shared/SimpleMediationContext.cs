@@ -1,7 +1,7 @@
 ﻿using System;
 using SimpleMediator.Core;
 
-namespace SimpleMediator.Samples.ConsoleApp
+namespace SimpleMediator.Samples.Shared
 {
     public class SimpleMediationContext : IMediationContext
     {

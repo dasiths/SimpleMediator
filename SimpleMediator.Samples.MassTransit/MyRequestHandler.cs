@@ -11,7 +11,7 @@ namespace SimpleMediator.Samples.MassTransit
         protected override async Task<SimpleMassTransitResponse> HandleQueryAsync(SimpleMassTransitMessage query,
             IMediationContext mediationContext, CancellationToken cancellationToken)
         {
-            Console.WriteLine("Proccessed");
+            Console.WriteLine($"Proccessed with mediation context of {mediationContext.GetType().Name}");
 
             return new SimpleMassTransitResponse()
             {

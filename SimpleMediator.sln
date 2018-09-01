@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleMediator.Samples.Cons
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleMediator.Extensions.Microsoft.DependencyInjection", "SimpleMediator.Extensions.Microsoft.DependencyInjection\SimpleMediator.Extensions.Microsoft.DependencyInjection.csproj", "{54487DB9-D0F0-48E3-A337-02D4B1A564C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleMediator.Samples.MassTransit", "SimpleMediator.Samples.MassTransit\SimpleMediator.Samples.MassTransit.csproj", "{740D9303-4302-4B8F-A650-A7EA2863B37A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleMediator.Samples.MassTransit", "SimpleMediator.Samples.MassTransit\SimpleMediator.Samples.MassTransit.csproj", "{740D9303-4302-4B8F-A650-A7EA2863B37A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleMediator.Samples.Shared", "SimpleMediator.Samples.Shared\SimpleMediator.Samples.Shared.csproj", "{47601841-EE84-4E11-8AF5-EC26D11183CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{740D9303-4302-4B8F-A650-A7EA2863B37A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{740D9303-4302-4B8F-A650-A7EA2863B37A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{740D9303-4302-4B8F-A650-A7EA2863B37A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47601841-EE84-4E11-8AF5-EC26D11183CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47601841-EE84-4E11-8AF5-EC26D11183CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47601841-EE84-4E11-8AF5-EC26D11183CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47601841-EE84-4E11-8AF5-EC26D11183CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

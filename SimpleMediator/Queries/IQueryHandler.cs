@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using SimpleMediator.Core;
+﻿using SimpleMediator.Core;
 
 namespace SimpleMediator.Queries
 {

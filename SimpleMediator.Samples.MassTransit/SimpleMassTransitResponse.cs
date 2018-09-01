@@ -1,6 +1,8 @@
-﻿namespace SimpleMediator.Samples.MassTransit
+﻿using SimpleMediator.Samples.Shared;
+
+namespace SimpleMediator.Samples.MassTransit
 {
-    public class SimpleMassTransitResponse
+    public class SimpleMassTransitResponse: ValidationResult
     {
         public string Message { get; set; }
     }

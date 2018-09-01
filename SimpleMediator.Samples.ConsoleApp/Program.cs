@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleMediator.Core;
-using SimpleMediator.Extensions.Microsoft.DependencyInjection;
-using SimpleMediator.Middleware;
+using SimpleMediator.Samples.Shared;
+using SimpleMediator.Samples.Shared.Helpers;
 
 namespace SimpleMediator.Samples.ConsoleApp
 {
+
     public class Program
     {
         public static void Main(string[] args)
@@ -19,13 +18,13 @@ namespace SimpleMediator.Samples.ConsoleApp
 
         public static async Task RunSample()
         {
-            using (var container = CreateServiceCollection())
+            using (var container = MicrosoftDependencyContainerHelper.CreateServiceCollection())
             {
                 var mediator = container.GetService<IMediator>();
                 await SendCommands(mediator);
             }
 
-            using (var container = CreateAutofacContainer())
+            using (var container = AutofacHelper.CreateAutofacContainer())
             {
                 var mediator = container.Resolve<IMediator>();
                 await SendCommands(mediator);
@@ -48,55 +47,6 @@ namespace SimpleMediator.Samples.ConsoleApp
             await mediator.HandleAsync(simpleCommand);
             await mediator.HandleAsync(simpleEvent);
             Console.ReadLine();
-        }
-
-        public static ServiceProvider CreateServiceCollection()
-        {
-            var services = new ServiceCollection();
-            services.AddSimpleMediator();
-
-            return services.BuildServiceProvider();
-        }
-
-        public static IContainer CreateAutofacContainer()
-        {
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.IsDynamic);
-            var builder = new ContainerBuilder();
-
-            foreach (var assembly in assemblies)
-            {
-                builder.RegisterAssemblyTypes(assembly).AsClosedTypesOf(typeof(IRequestHandler<,>)).AsImplementedInterfaces();
-
-                var middlewareTypes = assembly.GetTypes().Where(t =>
-                {
-                    return t.GetTypeInfo()
-                        .ImplementedInterfaces.Any(
-                            i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IMiddleware<,>));
-                });
-
-                foreach (var middlewareType in middlewareTypes)
-                {
-                    if (middlewareType.IsGenericType)
-                    {
-                        builder.RegisterGeneric(middlewareType).AsImplementedInterfaces();
-                    }
-                    else
-                    {
-                        builder.RegisterType(middlewareType).AsImplementedInterfaces();
-                    }
-                }
-            }
-
-            builder.Register<ServiceFactoryDelegate>(c =>
-            {
-                var context = c.Resolve<IComponentContext>();
-                return context.Resolve;
-            });
-            builder.RegisterType<ServiceFactory>().AsImplementedInterfaces();
-            builder.RegisterType<Mediator>().AsImplementedInterfaces();
-            builder.RegisterGeneric(typeof(RequestProcessor<,>)).AsImplementedInterfaces();
-
-            return builder.Build();
         }
     }
 }

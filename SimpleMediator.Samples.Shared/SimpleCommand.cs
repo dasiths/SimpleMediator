@@ -1,7 +1,6 @@
 ﻿using SimpleMediator.Commands;
-using SimpleMediator.Core;
 
-namespace SimpleMediator.Samples.ConsoleApp
+namespace SimpleMediator.Samples.Shared
 {
     public class SimpleCommand : ICommand
     {

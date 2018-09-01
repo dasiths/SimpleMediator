@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using SimpleMediator.Core;
 using SimpleMediator.Middleware;
+using SimpleMediator.Samples.Shared;
 
 namespace SimpleMediator.Samples.ConsoleApp
 {
-    public class SimpleValidator: IMiddleware<SimpleQuery, SimpleResponse>
+    public class SimpleStrongTypedValidator: IMiddleware<SimpleQuery, SimpleResponse>
     {
         public async Task<SimpleResponse> RunAsync(SimpleQuery request, IMediationContext mediationContext,
             CancellationToken cancellationToken, HandleRequestDelegate<SimpleQuery, SimpleResponse> next)

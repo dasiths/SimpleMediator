@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using MassTransit;
 using SimpleMediator.Core;
 
@@ -16,7 +15,7 @@ namespace SimpleMediator.Samples.MassTransit
 
         public async Task Consume(ConsumeContext<TRequest> context)
         {
-            context.Respond(await _mediator.HandleAsync(context.Message, MediationContext.Default, CancellationToken.None));
+            context.Respond(await _mediator.HandleAsync(context.Message, MassTransitReceiveMediationContext<TRequest, TResponse>.Default()));
         }
     }
 }

@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SimpleMediator.Samples.ConsoleApp\SimpleMediator.Samples.ConsoleApp.csproj" />
+    <ProjectReference Include="..\SimpleMediator.Samples.Shared\SimpleMediator.Samples.Shared.csproj" />
   </ItemGroup>
 
 </Project>

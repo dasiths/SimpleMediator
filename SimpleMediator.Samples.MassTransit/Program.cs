@@ -2,7 +2,7 @@
 using Autofac;
 using MassTransit;
 using SimpleMediator.Core;
-using SimpleMediator.Samples.ConsoleApp;
+using SimpleMediator.Samples.Shared.Helpers;
 
 namespace SimpleMediator.Samples.MassTransit
 {
@@ -19,7 +19,7 @@ namespace SimpleMediator.Samples.MassTransit
 
             var queueName = typeof(SimpleMassTransitMessage).Name;
 
-            using (var container = ConsoleApp.Program.CreateAutofacContainer())
+            using (var container = AutofacHelper.CreateAutofacContainer())
             {
                 var mediator = container.Resolve<IMediator>();
 
@@ -35,7 +35,7 @@ namespace SimpleMediator.Samples.MassTransit
 
                 busControl.Start();
 
-                var context = new MassTransitMediationContext<SimpleMassTransitMessage, SimpleMassTransitResponse>(busControl,
+                var context = new MassTransitSendMediationContext<SimpleMassTransitMessage, SimpleMassTransitResponse>(busControl,
                     new Uri($"loopback://localhost/{queueName}"),
                     TimeSpan.FromSeconds(10));
 

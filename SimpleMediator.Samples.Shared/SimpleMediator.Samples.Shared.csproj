@@ -1,22 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <LangVersion>default</LangVersion>
+    <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.8.1" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SimpleMediator.Extensions.Microsoft.DependencyInjection\SimpleMediator.Extensions.Microsoft.DependencyInjection.csproj" />
-    <ProjectReference Include="..\SimpleMediator.Samples.Shared\SimpleMediator.Samples.Shared.csproj" />
     <ProjectReference Include="..\SimpleMediator\SimpleMediator.csproj" />
   </ItemGroup>
 
