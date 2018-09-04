@@ -15,7 +15,13 @@ namespace SimpleMediator.Samples.MassTransit
 
         public async Task Consume(ConsumeContext<TRequest> context)
         {
-            context.Respond(await _mediator.HandleAsync(context.Message, MassTransitReceiveMediationContext<TRequest, TResponse>.Default()));
+            var mediationContext = new MassTransitReceiveMediationContext<TRequest, TResponse>(context);
+            var result = await _mediator.HandleAsync(context.Message, mediationContext);
+
+            if (!mediationContext.IsHandled)
+            {
+                context.Respond(result);
+            }
         }
     }
 }
