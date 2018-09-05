@@ -8,7 +8,10 @@ namespace SimpleMediator.Samples.Shared.Helpers
         public static ServiceProvider CreateServiceCollection()
         {
             var services = new ServiceCollection();
-            services.AddSimpleMediator();
+
+            services
+                .AddSimpleMediator()
+                .AddSimpleMediatorMiddleware();
 
             return services.BuildServiceProvider();
         }

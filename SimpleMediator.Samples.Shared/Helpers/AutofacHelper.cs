@@ -18,24 +18,7 @@ namespace SimpleMediator.Samples.Shared.Helpers
             {
                 builder.RegisterAssemblyTypes(assembly).AsClosedTypesOf(typeof(IRequestHandler<,>)).AsImplementedInterfaces();
 
-                var middlewareTypes = assembly.GetTypes().Where(t =>
-                {
-                    return t.GetTypeInfo()
-                        .ImplementedInterfaces.Any(
-                            i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IMiddleware<,>));
-                });
-
-                foreach (var middlewareType in middlewareTypes)
-                {
-                    if (middlewareType.IsGenericType)
-                    {
-                        builder.RegisterGeneric(middlewareType).AsImplementedInterfaces();
-                    }
-                    else
-                    {
-                        builder.RegisterType(middlewareType).AsImplementedInterfaces();
-                    }
-                }
+                AddMiddleware(assembly, builder);
             }
 
             builder.Register<ServiceFactoryDelegate>(c =>
@@ -48,6 +31,28 @@ namespace SimpleMediator.Samples.Shared.Helpers
             builder.RegisterGeneric(typeof(RequestProcessor<,>)).AsImplementedInterfaces();
 
             return builder.Build();
+        }
+
+        private static void AddMiddleware(Assembly assembly, ContainerBuilder builder)
+        {
+            var middlewareTypes = assembly.GetTypes().Where(t =>
+            {
+                return t.GetTypeInfo()
+                    .ImplementedInterfaces.Any(
+                        i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IMiddleware<,>));
+            });
+
+            foreach (var middlewareType in middlewareTypes)
+            {
+                if (middlewareType.IsGenericType)
+                {
+                    builder.RegisterGeneric(middlewareType).AsImplementedInterfaces();
+                }
+                else
+                {
+                    builder.RegisterType(middlewareType).AsImplementedInterfaces();
+                }
+            }
         }
     }
 }
