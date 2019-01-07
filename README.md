@@ -111,6 +111,7 @@ Conceptually I want the Mediator to take in a request, dispatch it to the domain
         }
         ```
 - Middleware
+
     If you really think about it, a middleware is another type of request handler. They are like the Russian [Matryoshka Dolls](https://en.wikipedia.org/wiki/Matryoshka_doll) with the very inner most doll being the query/command/event handler.
 
     This is how I implemented it.
@@ -127,6 +128,7 @@ Conceptually I want the Mediator to take in a request, dispatch it to the domain
     Notice how the method signature is exactly the same as a request handler except for the `next` argument. That's because the request handlers is the last middleware in the pipeline. There is no next middleware to run. 
 
 - The Request Processor
+
     The job of the request processor is to accept a request and pass it through the middleware pipeline. It constructs the pipeline and calls the `RunAsync` methods on the first middleware.
 
     ```csharp
