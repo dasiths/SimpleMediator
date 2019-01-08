@@ -6,10 +6,10 @@ namespace SimpleMediator.Queries
 {
     public abstract class QueryHandler<TQuery, TResponse> : IQueryHandler<TQuery, TResponse> where TQuery : IRequest<TResponse>
     {
-        public async Task<TResponse> HandleAsync(TQuery request, IMediationContext mediationContext,
+        public Task<TResponse> HandleAsync(TQuery request, IMediationContext mediationContext,
             CancellationToken cancellationToken)
         {
-            return await HandleQueryAsync(request, mediationContext, cancellationToken);
+            return HandleQueryAsync(request, mediationContext, cancellationToken);
         }
 
         protected abstract Task<TResponse> HandleQueryAsync(TQuery query, IMediationContext mediationContext,

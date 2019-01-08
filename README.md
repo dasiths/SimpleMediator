@@ -15,16 +15,30 @@ I believe in learning through examples. So to make it easier to understand let's
 
 The debt collection agency in that example is the mediator.
 
+## Why Use This Pattern?
+
+I've briefly touched about the advantage of less coupling between components but there are some side benefits as well.
+
+*Consider the scenario below*
+
+ You're developing a web api that needs to talk to the core domain objects to yield results. If you decide to communicate with your domain directly from your controllers, then inevitably you end up coupling your controller to a lot of domain level services. The line between your layers can get blurry here as well. By using the mediator pattern, you offload the heavy lifting to the request handlers. The handlers take a dependency on only the required domain services so things get much easier to understand and maintain. This gives you a clear separation from the controller layer as well.
+
+Because this is effectively a message dispatching pattern with the added benefit of decoupled reusable components, you can transition your project to follow a microservices type architecture later on if you wish to do so. This has been a very nice side benefit of using the pattern in my experience.
+
+This post [here](https://sourcemaking.com/design_patterns/mediator) gives more details about the pattern if you're interested.
+
+If you have used it before and have a story to tell, please leave a comment here. I'm keen to know :)
+
 ## Motivation
 
-There are a few of them around. The most popular one of course is [MediatR](https://github.com/jbogard/MediatR) from Jimmy Bogard. It's a very simple library with a `Request` and `Response` model with support for middleware. After investigating the source for `MediatR` (Which heavily inspired my design) and some other libraries I decided to create my own. This [post](https://drusellers.com/posts/greenpipes/) by Dru Sellers pointed me in the right direction.
+There are a few .NET implementations around. This [post](https://drusellers.com/posts/greenpipes/) by Dru Sellers pointed me in the right direction. The most popular one of course is [MediatR](https://github.com/jbogard/MediatR) from Jimmy Bogard. It's a very simple library with a `Request` and `Response` model with support for middleware. After investigating the source for `MediatR` (Which heavily inspired my design) and some other libraries I decided to create my own.
 
 My motivations were the following.
 
 - Defined types (of requests) for `Queries`, `Commands` and `Events`. I want the message type to convey intent.
 - Support for cancellation tokens.
 - Have a `MediationContext`. So when the request handler is called the Request is concise and lightweight. Any context related information is captured in this class.
-- Concept of middleware where each request goes through the pipeline and response come back through it.
+- Concept of `middleware`, where each request goes through the pipeline and response come back through it.
 - Have the ability to dispatch requests over the cloud (Using MassTransit or something similar) to a consumer (and get a response back). Much like how the [Brighter](https://github.com/BrighterCommand/Brighter) framework functions.
 
 ## Design
@@ -74,10 +88,10 @@ Conceptually I want the Mediator to take in a request, dispatch it to the domain
         ```csharp
         public abstract class QueryHandler<TQuery, TResponse> : IQueryHandler<TQuery, TResponse> where TQuery : IRequest<TResponse>
         {
-            public async Task<TResponse> HandleAsync(TQuery request, IMediationContext mediationContext,
+            public Task<TResponse> HandleAsync(TQuery request, IMediationContext mediationContext,
                 CancellationToken cancellationToken)
             {
-                return await HandleQueryAsync(request, mediationContext, cancellationToken);
+                return HandleQueryAsync(request, mediationContext, cancellationToken);
             }
 
             protected abstract Task<TResponse> HandleQueryAsync(TQuery query, IMediationContext mediationContext,
@@ -114,7 +128,7 @@ Conceptually I want the Mediator to take in a request, dispatch it to the domain
 
     If you really think about it, a middleware is another type of request handler. They are like the Russian [Matryoshka Dolls](https://en.wikipedia.org/wiki/Matryoshka_doll) with the very inner most doll being the query/command/event handler.
 
-    This is how I implemented it.
+    This is how I designed it.
     ```csharp
     public delegate Task<TResponse> HandleRequestDelegate<in TRequest, TResponse>(TRequest request, IMediationContext mediationContext, CancellationToken cancellationToken);
 
@@ -125,7 +139,7 @@ Conceptually I want the Mediator to take in a request, dispatch it to the domain
     }
     ```
 
-    Notice how the method signature is exactly the same as a request handler except for the `next` argument. That's because the request handlers is the last middleware in the pipeline. There is no next middleware to run. 
+    Notice how the method signature is exactly the same as a request handler except for the `next` argument. That's because a request handler is the last thing in the pipeline. There is no next middleware to run. That's the fundamental difference between a request handler and middleware.
 
 - The Request Processor
 
@@ -149,10 +163,10 @@ Conceptually I want the Mediator to take in a request, dispatch it to the domain
         // These come from the constructor. See the github repo for full code.
         // https://github.com/dasiths/SimpleMediator/blob/master/SimpleMediator/Middleware/RequestProcessor.cs
 
-        public async Task<TResponse> HandleAsync(TRequest request, IMediationContext mediationContext,
+        public Task<TResponse> HandleAsync(TRequest request, IMediationContext mediationContext,
             CancellationToken cancellationToken)
         {
-            return await RunMiddleware(request, HandleRequest, mediationContext, cancellationToken);
+            return RunMiddleware(request, HandleRequest, mediationContext, cancellationToken);
         }
 
         private async Task<TResponse> HandleRequest(TRequest requestObject, IMediationContext mediationContext, CancellationToken cancellationToken)
@@ -160,7 +174,7 @@ Conceptually I want the Mediator to take in a request, dispatch it to the domain
             // See github repo for full code
         }
 
-        private async Task<TResponse> RunMiddleware(TRequest request, HandleRequestDelegate<TRequest, TResponse> handleRequestHandlerCall, 
+        private Task<TResponse> RunMiddleware(TRequest request, HandleRequestDelegate<TRequest, TResponse> handleRequestHandlerCall, 
             IMediationContext mediationContext, CancellationToken cancellationToken)
         {
             HandleRequestDelegate<TRequest, TResponse> next = null;
@@ -168,7 +182,7 @@ Conceptually I want the Mediator to take in a request, dispatch it to the domain
             next = _middlewares.Reverse().Aggregate(handleRequestHandlerCall, (requestDelegate, middleware) =>
                 ((req, ctx, ct) => middleware.RunAsync(req, ctx, ct, requestDelegate)));
 
-            return await next.Invoke(request, mediationContext, cancellationToken);
+            return next.Invoke(request, mediationContext, cancellationToken);
         }
     }
     ```
@@ -185,7 +199,7 @@ Conceptually I want the Mediator to take in a request, dispatch it to the domain
     }
     ```
 
-    The implementation is as follows. `IServiceFactory` is just a service locator we use to help us utilize the IOC container of our choice. We use a **single instance** of the mediator to service all requests. This means we have to request an instance of `IRequestProcessor` per request type from our IOC container. The service locator pattern was used here because of that.
+    The implementation for the interface is as follows. `IServiceFactory` is just a service locator we use to help us utilize the IOC container of our choice. We use a **single instance** of the mediator to service all requests. This means we have to request an instance of `IRequestProcessor` per request type from our IOC container. The service locator pattern was used here because of that.
     
     See how the `ServiceFactoryDelegate` (In the `AddRequiredServices()` method) is used in the code sample [linked here](https://github.com/dasiths/SimpleMediator/blob/master/SimpleMediator.Extensions.Microsoft.DependencyInjection/ReflectionUtilities.cs) if you need help understanding how it links up with the IOC container.
     ```csharp
@@ -198,7 +212,7 @@ Conceptually I want the Mediator to take in a request, dispatch it to the domain
             _serviceFactory = serviceFactory;
         }
 
-        public async Task<TResponse> HandleAsync<TResponse>(IRequest<TResponse> request,
+        public Task<TResponse> HandleAsync<TResponse>(IRequest<TResponse> request,
             IMediationContext mediationContext = default(MediationContext), CancellationToken cancellationToken = default(CancellationToken))
         {
             if (mediationContext == null)
@@ -210,16 +224,32 @@ Conceptually I want the Mediator to take in a request, dispatch it to the domain
             var targetHandler = typeof(IRequestProcessor<,>).MakeGenericType(targetType, typeof(TResponse));
             var instance = _serviceFactory.GetInstance(targetHandler);
 
-            var result = InvokeInstance(instance, request, targetHandler, mediationContext, cancellationToken);
+            var result = InvokeInstanceAsync(instance, request, targetHandler, mediationContext, cancellationToken);
 
-            return await result;
+            return result;
+        }
+
+        private Task<TResponse> InvokeInstanceAsync<TResponse>(object instance, IRequest<TResponse> request, Type targetHandler, 
+            IMediationContext mediationContext, CancellationToken cancellationToken)
+        {
+            var method = instance.GetType()
+                .GetTypeInfo()
+                .GetMethod(nameof(IRequestProcessor<IRequest<TResponse>, TResponse>.HandleAsync));
+
+            if (method == null)
+            {
+                throw new ArgumentException($"{instance.GetType().Name} is not a known {targetHandler.Name}",
+                    instance.GetType().FullName);
+            }
+
+            return (Task<TResponse>) method.Invoke(instance, new object[] {request, mediationContext, cancellationToken});
         }
 
         // See the full code at https://github.com/dasiths/SimpleMediator/blob/master/SimpleMediator/Core/Mediator.cs
     }
     ```
 
-Those are the major pieces that make up the Mediator. Conceptually it is very simple but there are some implementation concern that make the code a bit complicated. I am aware of this.
+Those are the major pieces that make up the Mediator. Conceptually it is very simple but there are some implementation concerns that make the code a bit complicated. I am aware of this.
 
 ## Using It
 
@@ -281,4 +311,7 @@ Those are the major pieces that make up the Mediator. Conceptually it is very si
     - I have examples of how to set it up with IOC containers [here](https://github.com/dasiths/SimpleMediator/tree/master/SimpleMediator.Samples.Shared/Helpers). `Autofac` and `Microsoft.Extensions.DependencyInjection` currently have examples but I'll keep adding more as I go. 
     - There is also some code samples (work in progress) on how to integrate it with `MassTransit` to dispatch messages over the wire to consumers. Check it out [here](https://github.com/dasiths/SimpleMediator/tree/master/SimpleMediator.Samples.MassTransit).
 
-    As you can see, the usage it pretty straight forward and simple. The middleware gives you a lot of extensibility options and I've even been able to create constrained middleware that validates only certain types of requests.
+    As you can see, the usage is pretty straight forward and simple. The middleware gives you a lot of extensibility options and I've even been able to create constrained middleware that validates only certain types of requests.
+
+## Conclusion 
+I hope this post has been helpful in understanding the concepts behind the mediator pattern and how you would go about implementing it. All the code is hosted at https://github.com/dasiths/SimpleMediator under the MIT license. Feel free to have a look and create a PR if you think there are improvements. Please leave any feedback you have here. Thank you.

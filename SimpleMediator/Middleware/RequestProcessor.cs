@@ -24,10 +24,10 @@ namespace SimpleMediator.Middleware
                 serviceFactory.GetInstance(typeof(IEnumerable<IMiddleware<TRequest, TResponse>>));
         }
 
-        public async Task<TResponse> HandleAsync(TRequest request, IMediationContext mediationContext,
+        public Task<TResponse> HandleAsync(TRequest request, IMediationContext mediationContext,
             CancellationToken cancellationToken)
         {
-            return await RunMiddleware(request, HandleRequest, mediationContext, cancellationToken);
+            return RunMiddleware(request, HandleRequest, mediationContext, cancellationToken);
         }
 
         private async Task<TResponse> HandleRequest(TRequest requestObject, IMediationContext mediationContext, CancellationToken cancellationToken)
@@ -42,9 +42,14 @@ namespace SimpleMediator.Middleware
             if (typeof(IEvent).IsAssignableFrom(type))
             {
                 var tasks = _requestHandlers.Select(r => r.HandleAsync(requestObject, mediationContext, cancellationToken));
-                var results = await Task.WhenAll(tasks);
+                var result = default(TResponse);
 
-                return results.First();
+                foreach (var task in tasks)
+                {
+                    result = await task;
+                }
+
+                return result;
             }
 
             if (typeof(IQuery<TResponse>).IsAssignableFrom(type) || typeof(ICommand).IsAssignableFrom(type))
@@ -55,7 +60,7 @@ namespace SimpleMediator.Middleware
             throw new ArgumentException($"{typeof(TRequest).Name} is not a known type of {typeof(IRequest<>).Name} - Query, Command or Event", typeof(TRequest).FullName);
         }
 
-        private async Task<TResponse> RunMiddleware(TRequest request, HandleRequestDelegate<TRequest, TResponse> handleRequestHandlerCall, 
+        private Task<TResponse> RunMiddleware(TRequest request, HandleRequestDelegate<TRequest, TResponse> handleRequestHandlerCall, 
             IMediationContext mediationContext, CancellationToken cancellationToken)
         {
             HandleRequestDelegate<TRequest, TResponse> next = null;
@@ -63,7 +68,7 @@ namespace SimpleMediator.Middleware
             next = _middlewares.Reverse().Aggregate(handleRequestHandlerCall, (requestDelegate, middleware) =>
                 ((req, ctx, ct) => middleware.RunAsync(req, ctx, ct, requestDelegate)));
 
-            return await next.Invoke(request, mediationContext, cancellationToken);
+            return next.Invoke(request, mediationContext, cancellationToken);
         }
     }
 }
