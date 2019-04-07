@@ -1,4 +1,5 @@
-# SimpleMediator
+# SimpleMediator [![Build status](https://ci.appveyor.com/api/projects/status/4wbdssddl5qxukk7?svg=true)](https://ci.appveyor.com/project/dasiths/simplemediator) [![NuGet](https://img.shields.io/nuget/v/SimpleMediator.svg)](https://www.nuget.org/packages/SimpleMediator)
+
 A .NET/C# implementation of the mediator pattern with support for queries, commands and events. Has first class support for middleware and mediation contexts.
 
 ---
