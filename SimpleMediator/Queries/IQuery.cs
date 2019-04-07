@@ -2,7 +2,7 @@
 
 namespace SimpleMediator.Queries
 {
-    public interface IQuery<TResult>: IRequest<TResult>
+    public interface IQuery<TResult>: IMessage<TResult>
     {
     }
 }

@@ -16,7 +16,7 @@ namespace SimpleMediator.Samples.Shared.Helpers
 
             foreach (var assembly in assemblies)
             {
-                builder.RegisterAssemblyTypes(assembly).AsClosedTypesOf(typeof(IRequestHandler<,>)).AsImplementedInterfaces();
+                builder.RegisterAssemblyTypes(assembly).AsClosedTypesOf(typeof(IMessageHandler<,>)).AsImplementedInterfaces();
 
                 AddMiddleware(assembly, builder);
             }
@@ -28,7 +28,7 @@ namespace SimpleMediator.Samples.Shared.Helpers
             });
             builder.RegisterType<ServiceFactory>().AsImplementedInterfaces();
             builder.RegisterType<Mediator>().AsImplementedInterfaces();
-            builder.RegisterGeneric(typeof(RequestProcessor<,>)).AsImplementedInterfaces();
+            builder.RegisterGeneric(typeof(MessageProcessor<,>)).AsImplementedInterfaces();
 
             return builder.Build();
         }

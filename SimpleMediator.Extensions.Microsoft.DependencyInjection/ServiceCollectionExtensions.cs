@@ -10,11 +10,11 @@ namespace SimpleMediator.Extensions.Microsoft.DependencyInjection
     /// <summary>
     /// Extensions to scan for Mediator handlers and registers them.
     /// - Scans for any handler interface implementations and registers them as <see cref="ServiceLifetime.Transient"/>
-    /// - Scans for any <see cref="IRequestPreProcessor{TRequest}"/> and <see cref="IRequestPostProcessor{TRequest,TResponse}"/> implementations and registers them as scoped instances
+    /// - Scans for any <see cref="IMessagePreProcessor{TMessage}"/> and <see cref="IMessagePostProcessor{TMessage,TResponse}"/> implementations and registers them as scoped instances
     /// Registers <see cref="ServiceFactory"/> and <see cref="IMediator"/> as scoped instances
     /// After calling AddSimpleMediator you can use the container to resolve an <see cref="IMediator"/> instance.
     ///
-    /// This class and methods has been *heavily* influnced by __jbogard/MediatR.Extensions.Microsoft.DependencyInjection__
+    /// This class and methods has been *heavily* influenced by __jbogard/MediatR.Extensions.Microsoft.DependencyInjection__
     /// </summary>
     public static class ServiceCollectionExtensions
     {

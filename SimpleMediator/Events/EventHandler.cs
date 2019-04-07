@@ -4,12 +4,12 @@ using SimpleMediator.Core;
 
 namespace SimpleMediator.Events
 {
-    public abstract class EventHandler<TEvent> : IEventHandler<TEvent> where TEvent : IRequest<Unit>
+    public abstract class EventHandler<TEvent> : IEventHandler<TEvent> where TEvent : IMessage<Unit>
     {
-        public async Task<Unit> HandleAsync(TEvent request, IMediationContext mediationContext,
+        public async Task<Unit> HandleAsync(TEvent message, IMediationContext mediationContext,
             CancellationToken cancellationToken)
         {
-            await HandleEventAsync(request, mediationContext, cancellationToken);
+            await HandleEventAsync(message, mediationContext, cancellationToken);
             return Unit.Result;
         }
 

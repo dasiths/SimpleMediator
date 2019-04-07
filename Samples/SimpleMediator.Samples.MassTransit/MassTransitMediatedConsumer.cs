@@ -4,7 +4,7 @@ using SimpleMediator.Core;
 
 namespace SimpleMediator.Samples.MassTransit
 {
-    public class MassTransitMediatedConsumer<TRequest, TResponse> : IConsumer<TRequest> where TRequest : class, IRequest<TResponse> where TResponse : class
+    public class MassTransitMediatedConsumer<TMessage, TResponse> : IConsumer<TMessage> where TMessage : class, IMessage<TResponse> where TResponse : class
     {
         private readonly IMediator _mediator;
 
@@ -13,9 +13,9 @@ namespace SimpleMediator.Samples.MassTransit
             _mediator = mediator;
         }
 
-        public async Task Consume(ConsumeContext<TRequest> context)
+        public async Task Consume(ConsumeContext<TMessage> context)
         {
-            var mediationContext = new MassTransitReceiveMediationContext<TRequest, TResponse>(context);
+            var mediationContext = new MassTransitReceiveMediationContext<TMessage, TResponse>(context);
             var result = await _mediator.HandleAsync(context.Message, mediationContext);
 
             if (!mediationContext.IsHandled)

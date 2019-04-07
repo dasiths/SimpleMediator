@@ -299,7 +299,7 @@ namespace SimpleMediator.Extensions.Microsoft.DependencyInjection
             }));
 
             services.AddScoped<IServiceFactory, ServiceFactory>();
-            services.AddScoped(typeof(IRequestProcessor<,>), typeof(RequestProcessor<,>));
+            services.AddScoped(typeof(IMessageProcessor<,>), typeof(MessageProcessor<,>));
             services.AddScoped<IMediator, Mediator>();
         }
     }

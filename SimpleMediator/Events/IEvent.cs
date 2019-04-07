@@ -2,7 +2,7 @@
 
 namespace SimpleMediator.Events
 {
-    public interface IEvent : IRequest<Unit>
+    public interface IEvent : IMessage<Unit>
     {
 
     }

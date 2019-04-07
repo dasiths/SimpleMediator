@@ -9,11 +9,11 @@ namespace SimpleMediator.Samples.ConsoleApp
 {
     public class SimpleStrongTypedValidator: IMiddleware<SimpleQuery, SimpleResponse>
     {
-        public async Task<SimpleResponse> RunAsync(SimpleQuery request, IMediationContext mediationContext,
-            CancellationToken cancellationToken, HandleRequestDelegate<SimpleQuery, SimpleResponse> next)
+        public async Task<SimpleResponse> RunAsync(SimpleQuery message, IMediationContext mediationContext,
+            CancellationToken cancellationToken, HandleMessageDelegate<SimpleQuery, SimpleResponse> next)
         {
             Console.WriteLine("Validation hit");
-            return await next.Invoke(request, mediationContext, cancellationToken);
+            return await next.Invoke(message, mediationContext, cancellationToken);
         }
     }
 }

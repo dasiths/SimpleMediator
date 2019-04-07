@@ -4,12 +4,12 @@ using SimpleMediator.Core;
 
 namespace SimpleMediator.Commands
 {
-    public abstract class CommandHandler<TCommand> : ICommandHandler<TCommand> where TCommand : IRequest<Unit>
+    public abstract class CommandHandler<TCommand> : ICommandHandler<TCommand> where TCommand : IMessage<Unit>
     {
-        public async Task<Unit> HandleAsync(TCommand request, IMediationContext mediationContext,
+        public async Task<Unit> HandleAsync(TCommand message, IMediationContext mediationContext,
             CancellationToken cancellationToken)
         {
-            await HandleCommandAsync(request, mediationContext, cancellationToken);
+            await HandleCommandAsync(message, mediationContext, cancellationToken);
             return Unit.Result;
         }
 
