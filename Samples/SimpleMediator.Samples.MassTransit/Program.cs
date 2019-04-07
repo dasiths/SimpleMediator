@@ -12,7 +12,7 @@ namespace SimpleMediator.Samples.MassTransit
         {
             Console.WriteLine("Hello World!");
 
-            var request = new SimpleMassTransitMessage()
+            var message = new SimpleMassTransitMessage()
             {
                 Message = DateTime.Now.ToString()
             };
@@ -39,7 +39,7 @@ namespace SimpleMediator.Samples.MassTransit
                     new Uri($"loopback://localhost/{queueName}"),
                     TimeSpan.FromSeconds(10));
 
-                var result = mediator.HandleAsync(request, context).ConfigureAwait(false).GetAwaiter().GetResult();
+                var result = mediator.HandleAsync(message, context).ConfigureAwait(false).GetAwaiter().GetResult();
 
                 Console.WriteLine(result.Message);
 

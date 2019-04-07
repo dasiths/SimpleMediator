@@ -86,16 +86,16 @@ namespace SimpleMediator.Extensions.Microsoft.DependencyInjection
         /// Command/Query handlers should only be added once (so set addIfAlreadyExists to false)
         /// Event handlers should all be added (set addIfAlreadyExists to true)
         /// </summary>
-        /// <param name="openRequestInterfaces"></param>
+        /// <param name="openMessageInterfaces"></param>
         /// <param name="services"></param>
         /// <param name="assembliesToScan"></param>
         /// <param name="addIfAlreadyExists"></param>
-        private static void AddInterfacesAsTransient(Type[] openRequestInterfaces,
+        private static void AddInterfacesAsTransient(Type[] openMessageInterfaces,
             IServiceCollection services,
             IEnumerable<Assembly> assembliesToScan,
             bool addIfAlreadyExists)
         {
-            foreach (var openInterface in openRequestInterfaces)
+            foreach (var openInterface in openMessageInterfaces)
             {
                 var concretions = new List<Type>();
                 var interfaces = new List<Type>();
@@ -114,7 +114,7 @@ namespace SimpleMediator.Extensions.Microsoft.DependencyInjection
                     {
                         if (interfaceType.GetInterfaces().Any())
                         {
-                            // Register the RequestHandler instead of ICommand/Query/EventHandler
+                            // Register the MessageHandler instead of ICommand/Query/EventHandler
                             interfaces.AddRange(interfaceType.GetInterfaces());
                         }
                         else
@@ -299,7 +299,7 @@ namespace SimpleMediator.Extensions.Microsoft.DependencyInjection
             }));
 
             services.AddScoped<IServiceFactory, ServiceFactory>();
-            services.AddScoped(typeof(IRequestProcessor<,>), typeof(RequestProcessor<,>));
+            services.AddScoped(typeof(IMessageProcessor<,>), typeof(MessageProcessor<,>));
             services.AddScoped<IMediator, Mediator>();
         }
     }

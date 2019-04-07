@@ -15,7 +15,7 @@ namespace SimpleMediator.Core
             _serviceFactory = serviceFactory;
         }
 
-        public Task<TResponse> HandleAsync<TResponse>(IRequest<TResponse> request,
+        public Task<TResponse> HandleAsync<TResponse>(IMessage<TResponse> message,
             IMediationContext mediationContext = default(MediationContext), CancellationToken cancellationToken = default(CancellationToken))
         {
             if (mediationContext == null)
@@ -23,21 +23,21 @@ namespace SimpleMediator.Core
                 mediationContext = MediationContext.Default;
             }
 
-            var targetType = request.GetType();
-            var targetHandler = typeof(IRequestProcessor<,>).MakeGenericType(targetType, typeof(TResponse));
+            var targetType = message.GetType();
+            var targetHandler = typeof(IMessageProcessor<,>).MakeGenericType(targetType, typeof(TResponse));
             var instance = _serviceFactory.GetInstance(targetHandler);
 
-            var result = InvokeInstanceAsync(instance, request, targetHandler, mediationContext, cancellationToken);
+            var result = InvokeInstanceAsync(instance, message, targetHandler, mediationContext, cancellationToken);
 
             return result;
         }
 
-        private Task<TResponse> InvokeInstanceAsync<TResponse>(object instance, IRequest<TResponse> request, Type targetHandler, 
+        private Task<TResponse> InvokeInstanceAsync<TResponse>(object instance, IMessage<TResponse> message, Type targetHandler, 
             IMediationContext mediationContext, CancellationToken cancellationToken)
         {
             var method = instance.GetType()
                 .GetTypeInfo()
-                .GetMethod(nameof(IRequestProcessor<IRequest<TResponse>, TResponse>.HandleAsync));
+                .GetMethod(nameof(IMessageProcessor<IMessage<TResponse>, TResponse>.HandleAsync));
 
             if (method == null)
             {
@@ -45,7 +45,7 @@ namespace SimpleMediator.Core
                     instance.GetType().FullName);
             }
 
-            return (Task<TResponse>) method.Invoke(instance, new object[] {request, mediationContext, cancellationToken});
+            return (Task<TResponse>) method.Invoke(instance, new object[] {message, mediationContext, cancellationToken});
         }
     }
 }

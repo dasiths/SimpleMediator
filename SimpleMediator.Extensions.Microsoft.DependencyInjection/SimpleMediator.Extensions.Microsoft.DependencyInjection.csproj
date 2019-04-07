@@ -5,9 +5,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Dasith Wijesiriwardena</Authors>
     <Product>Simple Mediator Extensions for Microsoft Dependency Injection</Product>
-    <Description>A .NET/C# implementation of the mediator pattern with support for queries, commands and events. Has first class support for middleware and mediation contexts.
-
-This package provides support for wiring up your handlers and middleware with Microsoft.Extentions.DependencyInjection</Description>
+    <Description>A .NET/C# implementation of the mediator pattern with support for queries, commands and events. Has first class support for middleware and mediation contexts. This package provides support for wiring up your handlers and middleware with Microsoft.Extensions.DependencyInjection</Description>
     <Copyright>Dasith Wijesiriwardena - 2019</Copyright>
     <PackageLicenseUrl>https://github.com/dasiths/SimpleMediator/blob/master/License.md</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/dasiths/SimpleMediator</PackageProjectUrl>

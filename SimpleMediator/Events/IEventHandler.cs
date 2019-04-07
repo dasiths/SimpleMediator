@@ -2,7 +2,7 @@
 
 namespace SimpleMediator.Events
 {
-    public interface IEventHandler<in TEvent>: IRequestHandler<TEvent, Unit> where TEvent : IRequest<Unit>
+    public interface IEventHandler<in TEvent>: IMessageHandler<TEvent, Unit> where TEvent : IMessage<Unit>
     {
     }
 }

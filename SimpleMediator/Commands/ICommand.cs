@@ -2,7 +2,7 @@
 
 namespace SimpleMediator.Commands
 {
-    public interface ICommand: IRequest<Unit>
+    public interface ICommand: IMessage<Unit>
     {
     }
 }

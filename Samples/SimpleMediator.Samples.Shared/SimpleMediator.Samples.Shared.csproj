@@ -9,8 +9,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SimpleMediator.Extensions.Microsoft.DependencyInjection\SimpleMediator.Extensions.Microsoft.DependencyInjection.csproj" />
-    <ProjectReference Include="..\SimpleMediator\SimpleMediator.csproj" />
+    <ProjectReference Include="..\..\SimpleMediator.Extensions.Microsoft.DependencyInjection\SimpleMediator.Extensions.Microsoft.DependencyInjection.csproj" />
+    <ProjectReference Include="..\..\SimpleMediator\SimpleMediator.csproj" />
   </ItemGroup>
 
 </Project>

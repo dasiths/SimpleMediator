@@ -5,13 +5,13 @@ VisualStudioVersion = 15.0.27703.2042
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleMediator", "SimpleMediator\SimpleMediator.csproj", "{D33EBA3B-AFD7-4085-B5BD-F97E48788AA8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleMediator.Samples.ConsoleApp", "SimpleMediator.Samples.ConsoleApp\SimpleMediator.Samples.ConsoleApp.csproj", "{CAB56316-3FC6-4009-8CA8-F50C8157CB56}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleMediator.Samples.ConsoleApp", "Samples\SimpleMediator.Samples.ConsoleApp\SimpleMediator.Samples.ConsoleApp.csproj", "{CAB56316-3FC6-4009-8CA8-F50C8157CB56}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleMediator.Extensions.Microsoft.DependencyInjection", "SimpleMediator.Extensions.Microsoft.DependencyInjection\SimpleMediator.Extensions.Microsoft.DependencyInjection.csproj", "{54487DB9-D0F0-48E3-A337-02D4B1A564C7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleMediator.Samples.MassTransit", "SimpleMediator.Samples.MassTransit\SimpleMediator.Samples.MassTransit.csproj", "{740D9303-4302-4B8F-A650-A7EA2863B37A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleMediator.Samples.MassTransit", "Samples\SimpleMediator.Samples.MassTransit\SimpleMediator.Samples.MassTransit.csproj", "{740D9303-4302-4B8F-A650-A7EA2863B37A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleMediator.Samples.Shared", "SimpleMediator.Samples.Shared\SimpleMediator.Samples.Shared.csproj", "{47601841-EE84-4E11-8AF5-EC26D11183CC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleMediator.Samples.Shared", "Samples\SimpleMediator.Samples.Shared\SimpleMediator.Samples.Shared.csproj", "{47601841-EE84-4E11-8AF5-EC26D11183CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

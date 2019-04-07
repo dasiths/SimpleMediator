@@ -9,7 +9,7 @@ namespace SimpleMediator.Samples.ConsoleApp
 {
     public class SimpleCommandHandler : CommandHandler<SimpleCommand>
     {
-        protected override async Task HandleCommandAsync(SimpleCommand request, IMediationContext mediationContext,
+        protected override async Task HandleCommandAsync(SimpleCommand message, IMediationContext mediationContext,
             CancellationToken cancellationToken)
         {
             Console.WriteLine("Test Command");
