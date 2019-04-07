@@ -10,9 +10,9 @@ My motivations are the following.
 
 - Defined types (of `Messages`) for `Queries`, `Commands` and `Events`. Convery the intent clearly.
 - Support for cancellation tokens all the way down to message handlers.
-- Have a `MediationContext`. So when the request handler is called the Request is concise and lightweight. Any context related information is captured in this class.
-- Concept of `Middleware`, where each request goes through the pipeline and response come back through it.
-- Have the ability to dispatch requests over the wire to a consumer (and get a response back). The ambition is **clearly not** to create a full framework that supports sending message over the wire, but rather to make this library integrate with something like [MassTransit](http://masstransit-project.com/) with minimal effort.
+- Have a `MediationContext`. So when the message handler is called the Message is **concise and lightweight**. Any context related information is captured in the MediationContext instead.
+- Concept of `Middleware`, where each message goes through the pipeline and response come back through it.
+- Have the ability to dispatch messages over the wire to a consumer (and get a response back). The ambition is **clearly not** to create a full framework that supports sending message over the wire, but rather to make this library integrate with something like [MassTransit](http://masstransit-project.com/) with minimal effort.
 
 You can find more details about the design at my blog https://dasith.me/2019/01/07/mediator-pattern-implemented-in-net/
 ## Using It
