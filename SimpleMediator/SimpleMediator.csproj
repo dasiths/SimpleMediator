@@ -2,6 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Dasith Wijesiriwardena</Authors>
+    <Description>A .NET/C# implementation of the mediator pattern with support for queries, commands and events. Has first class support for middleware and mediation contexts.</Description>
+    <PackageLicenseUrl>https://github.com/dasiths/SimpleMediator/blob/master/License.md</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/dasiths/SimpleMediator</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/dasiths/SimpleMediator</RepositoryUrl>
+    <RepositoryType>GIT</RepositoryType>
+    <PackageTags>mediator, command, query, event, handlers, CQRS, middleware</PackageTags>
+    <Copyright>Dasith Wijesiriwardena - 2019</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
