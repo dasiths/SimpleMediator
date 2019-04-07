@@ -30,7 +30,7 @@ namespace SimpleMediator.Middleware
             return RunMiddleware(message, HandleMessageAsync, mediationContext, cancellationToken);
         }
 
-        private async Task<TResponse> HandleMessageAsync(TMessage requestObject, IMediationContext mediationContext, CancellationToken cancellationToken)
+        private async Task<TResponse> HandleMessageAsync(TMessage messageObject, IMediationContext mediationContext, CancellationToken cancellationToken)
         {
             var type = typeof(TMessage);
 
@@ -41,7 +41,7 @@ namespace SimpleMediator.Middleware
 
             if (typeof(IEvent).IsAssignableFrom(type))
             {
-                var tasks = _messageHandlers.Select(r => r.HandleAsync(requestObject, mediationContext, cancellationToken));
+                var tasks = _messageHandlers.Select(r => r.HandleAsync(messageObject, mediationContext, cancellationToken));
                 var result = default(TResponse);
 
                 foreach (var task in tasks)
@@ -54,7 +54,7 @@ namespace SimpleMediator.Middleware
 
             if (typeof(IQuery<TResponse>).IsAssignableFrom(type) || typeof(ICommand).IsAssignableFrom(type))
             {
-                return await _messageHandlers.Single().HandleAsync(requestObject, mediationContext, cancellationToken);
+                return await _messageHandlers.Single().HandleAsync(messageObject, mediationContext, cancellationToken);
             }
 
             throw new ArgumentException($"{typeof(TMessage).Name} is not a known type of {typeof(IMessage<>).Name} - Query, Command or Event", typeof(TMessage).FullName);
@@ -65,8 +65,8 @@ namespace SimpleMediator.Middleware
         {
             HandleMessageDelegate<TMessage, TResponse> next = null;
 
-            next = _middlewares.Reverse().Aggregate(handleMessageHandlerCall, (requestDelegate, middleware) =>
-                ((req, ctx, ct) => middleware.RunAsync(req, ctx, ct, requestDelegate)));
+            next = _middlewares.Reverse().Aggregate(handleMessageHandlerCall, (messageDelegate, middleware) =>
+                ((req, ctx, ct) => middleware.RunAsync(req, ctx, ct, messageDelegate)));
 
             return next.Invoke(message, mediationContext, cancellationToken);
         }

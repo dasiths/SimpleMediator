@@ -17,9 +17,9 @@ namespace SimpleMediator.Samples.ConsoleApp
                 Console.WriteLine(context.CurrentTime);
             }
 
-            Console.WriteLine("Request pre logged using middleware 2");
+            Console.WriteLine("Message pre logged using middleware 2");
             var result = await next.Invoke(message, mediationContext, cancellationToken);
-            Console.WriteLine("Request post logged using middleware 2");
+            Console.WriteLine("Message post logged using middleware 2");
 
             return result;
         }
