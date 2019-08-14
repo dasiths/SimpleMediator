@@ -16,7 +16,8 @@ namespace SimpleMediator.Core
         }
 
         public Task<TResponse> HandleAsync<TResponse>(IMessage<TResponse> message,
-            IMediationContext mediationContext = default(MediationContext), CancellationToken cancellationToken = default(CancellationToken))
+            IMediationContext mediationContext = default(IMediationContext),
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             if (mediationContext == null)
             {
@@ -32,7 +33,25 @@ namespace SimpleMediator.Core
             return result;
         }
 
-        private Task<TResponse> InvokeInstanceAsync<TResponse>(object instance, IMessage<TResponse> message, Type targetHandler, 
+        public Task<TResponse> HandleAsync<TMessage, TResponse>(TMessage message,
+            IMediationContext mediationContext = default(IMediationContext),
+            CancellationToken cancellationToken = default(CancellationToken)) where TMessage : IMessage<TResponse>
+        {
+            if (mediationContext == null)
+            {
+                mediationContext = MediationContext.Default;
+            }
+
+            var targetHandler = typeof(IMessageProcessor<TMessage, TResponse>);
+            var instance = _serviceFactory.GetInstance(targetHandler);
+
+            var result = InvokeInstanceAsync(instance, message, targetHandler, mediationContext, cancellationToken);
+
+            return result;
+        }
+
+        private Task<TResponse> InvokeInstanceAsync<TResponse>(object instance,
+            IMessage<TResponse> message, Type targetHandler,
             IMediationContext mediationContext, CancellationToken cancellationToken)
         {
             var method = instance.GetType()
@@ -45,7 +64,7 @@ namespace SimpleMediator.Core
                     instance.GetType().FullName);
             }
 
-            return (Task<TResponse>) method.Invoke(instance, new object[] {message, mediationContext, cancellationToken});
+            return (Task<TResponse>)method.Invoke(instance, new object[] { message, mediationContext, cancellationToken });
         }
     }
 }
